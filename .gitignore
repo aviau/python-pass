@@ -1,0 +1,20 @@
+# python stuff
+env
+*.pyc
+
+# tox
+*.egg
+*.egg-info
+.tox
+AUTHORS
+dist
+ChangeLog
+doc/build
+build
+
+# coverage
+.coverage*
+cover
+
+# pycharm
+.idea
