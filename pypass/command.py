@@ -41,8 +41,8 @@ def init(path, gpg_id):
         os.makedirs(path)
 
     # Create .gpg_id and put the gpg id in it
-    gpg_id_file = open(os.path.join(path, '.gpg_id'), 'w')
-    gpg_id_file.write(gpg_id)
+    with open(os.path.join(path, '.gpg_id'), 'w') as gpg_id_file:
+        gpg_id_file.write(gpg_id)
 
 if __name__ == '__main__':
     main()
