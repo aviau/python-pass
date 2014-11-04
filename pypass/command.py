@@ -17,5 +17,32 @@
 #    along with python-pass.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import click
+import os
+
+
+@click.group()
 def main():
-    print('Hello World!')
+    pass
+
+
+@main.command()
+@click.option('--path', '-p',
+              type=click.Path(file_okay=False),
+              default='~/.password-store',
+              help='Where to create the password store.')
+@click.argument('gpg-id', type=click.STRING)
+def init(path, gpg_id):
+    print ('path: ' + path)
+    print ('gpg_id: ' + gpg_id)
+
+    # Create a folder at the path
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    # Create .gpg_id and put the gpg id in it
+    gpg_id_file = open(os.path.join(path, '.gpg_id'), 'w')
+    gpg_id_file.write(gpg_id)
+
+if __name__ == '__main__':
+    main()
