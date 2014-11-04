@@ -55,7 +55,9 @@ class TestCommand(unittest.TestCase):
         )
 
         self.assertTrue(
-            os.path.isfile(os.path.join(self.dir, '.password-store', '.gpg_id'))
+            os.path.isfile(
+                os.path.join(self.dir, '.password-store', '.gpg_id')
+            )
         )
 
         self.assertEqual(
