@@ -11,3 +11,9 @@ For fun, I have decided to write [pass](http://www.passwordstore.org/) in Python
 - [X] ```pypass init``` -  creates a folder and a .gpg-id file
 - [X] Support ```--path``` option
 - [ ] re-encryption functionality
+
+### ```pypass insert```
+
+- [X] ```pypass insert test.com``` prompts for a password and creates a test.com.gpg file
+- [ ] multi-line support
+

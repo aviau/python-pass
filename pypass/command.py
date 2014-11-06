@@ -23,8 +23,15 @@ import subprocess
 
 
 @click.group()
-def main():
-    pass
+@click.option('--PASSWORD_STORE_DIR',
+              envvar='PASSWORD_STORE_DIR',
+              default=os.path.join(os.getenv("HOME"), ".password-store"),
+              type=click.Path(file_okay=False, resolve_path=True))
+@click.pass_context
+def main(ctx, password_store_dir):
+    config = {}
+    config['password_store_dir'] = password_store_dir
+    ctx.obj = config
 
 
 @main.command()
@@ -48,12 +55,12 @@ def init(path, gpg_id):
 
 @main.command()
 @click.argument('path', type=click.STRING)
-def insert(path):
+@click.pass_obj
+def insert(config, path):
 
-    # TODO: Don't hardcode ~/.password-store
     passfile_path = os.path.realpath(
         os.path.join(
-            os.path.expanduser('~/.password-store'),
+            config['password_store_dir'],
             path + '.gpg'
         )
     )
@@ -68,7 +75,7 @@ def insert(path):
         [
             'gpg',
             '-R',
-            '3CCC3A3A', # TODO: Get user's key
+            '3CCC3A3A',  # TODO: Get user's key
             '--batch',
             '--no-tty',
             '-o', passfile_path,
@@ -82,9 +89,10 @@ def insert(path):
 
     gpg.stdin.write(password)
     gpg.stdin.close()
+    gpg.wait()
 
-    #print gpg.stderr.read().strip()
-    #print gpg.stdout.read().strip()
+    # print gpg.stderr.read().strip()
+    # print gpg.stdout.read().strip()
 
 
 if __name__ == '__main__':

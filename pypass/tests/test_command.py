@@ -27,43 +27,60 @@ import click.testing
 import pypass.command
 
 
-def run_cli(args):
-    runner = click.testing.CliRunner()
-    result = runner.invoke(pypass.command.main, args)
-    return result
-
-
 class TestCommand(unittest.TestCase):
+
+    def run_cli(self, args, input=None):
+        args = ['--PASSWORD_STORE_DIR', self.dir] + list(args)
+        runner = click.testing.CliRunner()
+        result = runner.invoke(pypass.command.main, args, input=input)
+        return result
 
     def setUp(self):
         self.dir = tempfile.mkdtemp()
+
+        # .gpg_id file
+        open(os.path.join(self.dir, '.gpg_id'), 'w').write('3CCC3A3A')
 
     def tearDown(self):
         shutil.rmtree(self.dir)
 
     def test_init(self):
-        run_cli(
+        init_dir = tempfile.mkdtemp()
+        self.run_cli(
             [
                 'init',
-                '-p', os.path.join(self.dir, '.password-store'),
+                '-p', os.path.join(init_dir, '.password-store'),
                 '3CCC3A3A'
             ]
         )
 
         self.assertTrue(
-            os.path.isdir(os.path.join(self.dir, '.password-store'))
+            os.path.isdir(os.path.join(init_dir, '.password-store'))
         )
 
         self.assertTrue(
             os.path.isfile(
-                os.path.join(self.dir, '.password-store', '.gpg_id')
+                os.path.join(init_dir, '.password-store', '.gpg_id')
             )
         )
 
         self.assertEqual(
             open(
-                os.path.join(self.dir, '.password-store', '.gpg_id'),
+                os.path.join(init_dir, '.password-store', '.gpg_id'),
                 'r'
             ).read(),
             '3CCC3A3A'
+        )
+        shutil.rmtree(init_dir)
+
+    def test_insert(self):
+        self.run_cli(
+            [
+                'insert', 'test.com'
+            ],
+            input='super_secret\nsuper_secret'
+        )
+
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.dir, 'test.com.gpg'))
         )
