@@ -19,6 +19,7 @@
 
 import click
 import os
+import subprocess
 
 
 @click.group()
@@ -28,7 +29,7 @@ def main():
 
 @main.command()
 @click.option('--path', '-p',
-              type=click.Path(file_okay=False),
+              type=click.Path(file_okay=False, resolve_path=True),
               default='~/.password-store',
               help='Where to create the password store.')
 @click.argument('gpg-id', type=click.STRING)
@@ -43,6 +44,48 @@ def init(path, gpg_id):
     # Create .gpg_id and put the gpg id in it
     gpg_id_file = open(os.path.join(path, '.gpg_id'), 'w')
     gpg_id_file.write(gpg_id)
+
+
+@main.command()
+@click.argument('path', type=click.STRING)
+def insert(path):
+
+    # TODO: Don't hardcode ~/.password-store
+    passfile_path = os.path.realpath(
+        os.path.join(
+            os.path.expanduser('~/.password-store'),
+            path + '.gpg'
+        )
+    )
+
+    password = click.prompt(
+        'Enter the password',
+        type=str,
+        confirmation_prompt=True
+    )
+
+    gpg = subprocess.Popen(
+        [
+            'gpg',
+            '-R',
+            '3CCC3A3A', # TODO: Get user's key
+            '--batch',
+            '--no-tty',
+            '-o', passfile_path,
+            '-e',
+        ],
+        shell=False,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    gpg.stdin.write(password)
+    gpg.stdin.close()
+
+    #print gpg.stderr.read().strip()
+    #print gpg.stdout.read().strip()
+
 
 if __name__ == '__main__':
     main()
