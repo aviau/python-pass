@@ -83,7 +83,7 @@ def insert(config, path):
         stderr=subprocess.PIPE
     )
 
-    gpg.stdin.write(password)
+    gpg.stdin.write(password.encode())
     gpg.stdin.close()
     gpg.wait()
 
