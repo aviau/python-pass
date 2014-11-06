@@ -31,6 +31,11 @@ import subprocess
 def main(ctx, password_store_dir):
     config = {}
     config['password_store_dir'] = password_store_dir
+
+    gpg_id_file = os.path.join(password_store_dir, '.gpg-id')
+    if os.path.isfile(gpg_id_file):
+        config['gpg-id'] = open(gpg_id_file, 'r').read()
+
     ctx.obj = config
 
 
@@ -46,7 +51,7 @@ def init(path, gpg_id):
         os.makedirs(path)
 
     # Create .gpg_id and put the gpg id in it
-    with open(os.path.join(path, '.gpg_id'), 'w') as gpg_id_file:
+    with open(os.path.join(path, '.gpg-id'), 'w') as gpg_id_file:
         gpg_id_file.write(gpg_id)
 
 
@@ -71,7 +76,7 @@ def insert(config, path):
         [
             'gpg',
             '-R',
-            '3CCC3A3A',  # TODO: Get user's key
+            config['gpg-id'],  # TODO: Get user's key
             '--batch',
             '--no-tty',
             '-o', passfile_path,

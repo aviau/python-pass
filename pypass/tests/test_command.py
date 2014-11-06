@@ -39,7 +39,7 @@ class TestCommand(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
 
         # .gpg_id file
-        open(os.path.join(self.dir, '.gpg_id'), 'w').write('5C5833E3')
+        open(os.path.join(self.dir, '.gpg-id'), 'w').write('5C5833E3')
 
     def tearDown(self):
         shutil.rmtree(self.dir)
@@ -60,13 +60,13 @@ class TestCommand(unittest.TestCase):
 
         self.assertTrue(
             os.path.isfile(
-                os.path.join(init_dir, '.password-store', '.gpg_id')
+                os.path.join(init_dir, '.password-store', '.gpg-id')
             )
         )
 
         self.assertEqual(
             open(
-                os.path.join(init_dir, '.password-store', '.gpg_id'),
+                os.path.join(init_dir, '.password-store', '.gpg-id'),
                 'r'
             ).read(),
             '5C5833E3'
