@@ -39,7 +39,7 @@ class TestCommand(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
 
         # .gpg_id file
-        open(os.path.join(self.dir, '.gpg_id'), 'w').write('3CCC3A3A')
+        open(os.path.join(self.dir, '.gpg_id'), 'w').write('5C5833E3')
 
     def tearDown(self):
         shutil.rmtree(self.dir)
@@ -50,7 +50,7 @@ class TestCommand(unittest.TestCase):
             [
                 'init',
                 '-p', os.path.join(init_dir, '.password-store'),
-                '3CCC3A3A'
+                '5C5833E3'
             ]
         )
 
@@ -69,7 +69,7 @@ class TestCommand(unittest.TestCase):
                 os.path.join(init_dir, '.password-store', '.gpg_id'),
                 'r'
             ).read(),
-            '3CCC3A3A'
+            '5C5833E3'
         )
         shutil.rmtree(init_dir)
 
