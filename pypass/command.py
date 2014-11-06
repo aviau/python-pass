@@ -41,9 +41,6 @@ def main(ctx, password_store_dir):
               help='Where to create the password store.')
 @click.argument('gpg-id', type=click.STRING)
 def init(path, gpg_id):
-    print ('path: ' + path)
-    print ('gpg_id: ' + gpg_id)
-
     # Create a folder at the path
     if not os.path.exists(path):
         os.makedirs(path)
@@ -57,7 +54,6 @@ def init(path, gpg_id):
 @click.argument('path', type=click.STRING)
 @click.pass_obj
 def insert(config, path):
-
     passfile_path = os.path.realpath(
         os.path.join(
             config['password_store_dir'],
