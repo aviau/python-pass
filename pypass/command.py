@@ -76,8 +76,7 @@ def insert(config, path):
     gpg = subprocess.Popen(
         [
             'gpg',
-            '-R',
-            config['gpg-id'],
+            '-R', config['gpg-id'],
             '--batch',
             '--no-tty',
             '-o', passfile_path,

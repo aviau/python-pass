@@ -39,7 +39,8 @@ class TestCommand(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
 
         # .gpg_id file
-        open(os.path.join(self.dir, '.gpg-id'), 'w').write('5C5833E3')
+        with open(os.path.join(self.dir, '.gpg-id'), 'w') as gpg_id_file:
+            gpg_id_file.write('5C5833E3')
 
     def tearDown(self):
         shutil.rmtree(self.dir)
