@@ -20,6 +20,7 @@
 import click
 import os
 import subprocess
+import sys
 
 
 @click.group()
@@ -76,7 +77,7 @@ def insert(config, path):
         [
             'gpg',
             '-R',
-            config['gpg-id'],  # TODO: Get user's key
+            config['gpg-id'],
             '--batch',
             '--no-tty',
             '-o', passfile_path,
@@ -92,8 +93,11 @@ def insert(config, path):
     gpg.stdin.close()
     gpg.wait()
 
-    # print gpg.stderr.read().strip()
-    # print gpg.stdout.read().strip()
+    # Check for gpg errors
+    if gpg.returncode != 0:
+        click.echo("GPG error:")
+        click.echo(gpg.stderr.read())
+        sys.exit(1)
 
 
 if __name__ == '__main__':
