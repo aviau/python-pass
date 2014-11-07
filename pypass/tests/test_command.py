@@ -18,6 +18,7 @@
 #
 
 import os
+import re
 import shutil
 import tempfile
 import unittest
@@ -96,3 +97,25 @@ class TestCommand(unittest.TestCase):
         )
 
         self.assertEqual(show_result.output, 'super_secret\n')
+
+    def test_ls(self):
+        # Create three dummy files
+        with open(os.path.join(self.dir, 'linux.ca.gpg'), 'w') as dummy_file:
+            dummy_file.write('eunux')
+
+        with open(
+                os.path.join(self.dir, 'passwordstore.org.gpg'), 'w'
+        ) as dummy_file:
+            dummy_file.write('is awesome')
+
+        with open(os.path.join(self.dir, 'test.com.gpg'), 'w') as dummy_file:
+            dummy_file.write('Damn! Cleartext!')
+
+        ls_result = self.run_cli(['ls'])
+
+        self.assertIsNotNone(
+            re.search(
+                ".*linux.ca.gpg\s.*passwordstore.org.gpg\s.*test.com.gpg",
+                ls_result.output
+            )
+        )

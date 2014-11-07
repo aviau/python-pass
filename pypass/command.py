@@ -132,5 +132,30 @@ def show(config, path):
         click.echo(gpg.stderr.read())
         sys.exit(1)
 
+
+@main.command()
+@click.pass_obj
+def ls(config):
+    tree = subprocess.Popen(
+        [
+            'tree',
+            '-C',
+            '-l',
+            '--noreport',
+            config['password_store_dir'],
+        ],
+        shell=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    tree.wait()
+
+    if tree.returncode == 0:
+        click.echo(tree.stdout.read())
+    else:
+        click.echo("Tree error:")
+        click.echo(tree.stderr.read())
+        sys.exit(1)
+
 if __name__ == '__main__':
     main()
