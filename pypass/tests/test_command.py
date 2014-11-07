@@ -119,3 +119,21 @@ class TestCommand(unittest.TestCase):
                 ls_result.output
             )
         )
+
+    def test_rm(self):
+        # Create one dummy file
+        dummy_file_path = os.path.join(self.dir, 'test.com.gpg')
+
+        with open(dummy_file_path, 'w') as dummy_file:
+            dummy_file.write('test.com')
+
+        self.assertTrue(os.path.isfile(dummy_file_path))
+        self.run_cli(['rm', 'test.com'])
+        self.assertFalse(os.path.isfile(dummy_file_path))
+
+    def test_rm_dont_exist(self):
+        result = self.run_cli(['rm', 'test.com'])
+        self.assertEqual(
+            result.output,
+            'Error: test.com is not in the password store\n'
+        )

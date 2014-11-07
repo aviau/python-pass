@@ -103,6 +103,23 @@ def insert(config, path):
 @main.command()
 @click.argument('path', type=click.STRING)
 @click.pass_obj
+def rm(config, path):
+    passfile_path = os.path.realpath(
+        os.path.join(
+            config['password_store_dir'],
+            path + '.gpg'
+        )
+    )
+
+    if os.path.isfile(passfile_path):
+        os.remove(passfile_path)
+    else:
+        click.echo("Error: %s is not in the password store" % path)
+
+
+@main.command()
+@click.argument('path', type=click.STRING)
+@click.pass_obj
 def show(config, path):
     passfile_path = os.path.realpath(
         os.path.join(

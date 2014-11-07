@@ -37,3 +37,10 @@ Project Status
 - [X] ``pypass ls`` shows the content of the password store with ``tree``
 - [ ] Hide .gpg at the end of each entry
 - [ ] Accept subfolder argument
+
+``pypass rm``
+-------------
+
+- [X] ``pypass rm test.com`` removes the test.com.gpg file
+- [ ] ``pypass remove`` and ``pypass delete`` aliases
+- [ ] Recursive option
