@@ -23,7 +23,7 @@ import subprocess
 import sys
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.option('--PASSWORD_STORE_DIR',
               envvar='PASSWORD_STORE_DIR',
               default=os.path.join(os.getenv("HOME"), ".password-store"),
@@ -38,6 +38,10 @@ def main(ctx, password_store_dir):
         config['gpg-id'] = open(gpg_id_file, 'r').read()
 
     ctx.obj = config
+
+    # By default, invoke ls
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(ls)
 
 
 @main.command()

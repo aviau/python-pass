@@ -109,12 +109,14 @@ class TestCommand(unittest.TestCase):
 
         ls_result = self.run_cli(['ls'])
 
-        self.assertIsNotNone(
-            re.search(
-                ".*linux.ca.gpg\s.*passwordstore.org.gpg\s.*test.com.gpg",
-                ls_result.output
-            )
-        )
+        expected_regex = \
+            ".*linux.ca.gpg\s.*passwordstore.org.gpg\s.*test.com.gpg"
+
+        self.assertIsNotNone(re.search(expected_regex, ls_result.output))
+
+        # By default, pypass should run the ls command
+        ls_default_result = self.run_cli([])
+        self.assertEqual(ls_result.output, ls_default_result.output)
 
     def test_rm(self):
         # Create one dummy file
