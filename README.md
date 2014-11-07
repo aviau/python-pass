@@ -23,6 +23,6 @@ For fun, I have decided to write [pass](http://www.passwordstore.org/) in Python
 - [X] ```pypass show test.com``` will display the content of test.com.gpg
 
 ### ```pypass ls```
-- [X] ```pypass ls``` shows the content of the password store with tree
+- [X] ```pypass ls``` shows the content of the password store with ```tree```
 - [ ] Hide .gpg at the end of each entry
 - [ ] Accept subfolder argument
