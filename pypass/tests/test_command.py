@@ -96,16 +96,9 @@ class TestCommand(unittest.TestCase):
 
     def test_ls(self):
         # Create three dummy files
-        with open(os.path.join(self.dir, 'linux.ca.gpg'), 'w') as dummy_file:
-            dummy_file.write('eunux')
-
-        with open(
-                os.path.join(self.dir, 'passwordstore.org.gpg'), 'w'
-        ) as dummy_file:
-            dummy_file.write('is awesome')
-
-        with open(os.path.join(self.dir, 'test.com.gpg'), 'w') as dummy_file:
-            dummy_file.write('Damn! Cleartext!')
+        open(os.path.join(self.dir, 'linux.ca.gpg'), 'a').close()
+        open(os.path.join(self.dir, 'passwordstore.org.gpg'), 'a').close()
+        open(os.path.join(self.dir, 'test.com.gpg'), 'a').close()
 
         ls_result = self.run_cli(['ls'])
 
