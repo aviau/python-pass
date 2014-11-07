@@ -50,5 +50,5 @@ Project Status
 ``pypass find``
 ---------------
 
-- [X] ``pypass find python.org pypass`` fill show a tree with password entries that match python.org or pass
+- [X] ``pypass find python.org pypass`` will show a tree with password entries that match python.org or pass
 - [X] Accepts one or many search terms
