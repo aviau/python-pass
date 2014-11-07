@@ -17,3 +17,6 @@ For fun, I have decided to write [pass](http://www.passwordstore.org/) in Python
 - [X] ```pypass insert test.com``` prompts for a password and creates a test.com.gpg file
 - [ ] multi-line support
 
+### ```pypass show```
+
+- [X] ```pypass show test.com``` will display the content of test.com.gpg

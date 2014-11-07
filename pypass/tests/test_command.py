@@ -74,7 +74,8 @@ class TestCommand(unittest.TestCase):
         )
         shutil.rmtree(init_dir)
 
-    def test_insert(self):
+    def test_insert_and_show(self):
+        # Insert a password for test.com
         self.run_cli(
             [
                 'insert', 'test.com'
@@ -85,3 +86,13 @@ class TestCommand(unittest.TestCase):
         self.assertTrue(
             os.path.isfile(os.path.join(self.dir, 'test.com.gpg'))
         )
+
+        # Show the password for test.com
+        show_result = self.run_cli(
+            [
+                'show', 'test.com'
+            ],
+            input='super_secret\nsuper_secret'
+        )
+
+        self.assertEqual(show_result.output, 'super_secret\n')

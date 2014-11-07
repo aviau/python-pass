@@ -43,7 +43,7 @@ def main(ctx, password_store_dir):
 @main.command()
 @click.option('--path', '-p',
               type=click.Path(file_okay=False, resolve_path=True),
-              default='~/.password-store',
+              default=os.path.join(os.getenv("HOME"), ".password-store"),
               help='Where to create the password store.')
 @click.argument('gpg-id', type=click.STRING)
 def init(path, gpg_id):
@@ -75,12 +75,13 @@ def insert(config, path):
 
     gpg = subprocess.Popen(
         [
-            'gpg',
-            '-R', config['gpg-id'],
-            '--batch',
-            '--no-tty',
-            '-o', passfile_path,
+            'gpg2',
             '-e',
+            '-r', config['gpg-id'],
+            '--batch',
+            '--use-agent',
+            '--no-tty',
+            '-o', passfile_path
         ],
         shell=False,
         stdin=subprocess.PIPE,
@@ -98,6 +99,38 @@ def insert(config, path):
         click.echo(gpg.stderr.read())
         sys.exit(1)
 
+
+@main.command()
+@click.argument('path', type=click.STRING)
+@click.pass_obj
+def show(config, path):
+    passfile_path = os.path.realpath(
+        os.path.join(
+            config['password_store_dir'],
+            path + '.gpg'
+        )
+    )
+
+    gpg = subprocess.Popen(
+        [
+            'gpg2',
+            '--quiet',
+            '--batch',
+            '--use-agent',
+            '-d', passfile_path,
+        ],
+        shell=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    gpg.wait()
+
+    if gpg.returncode == 0:
+        click.echo(gpg.stdout.read())
+    else:
+        click.echo("GPG error:")
+        click.echo(gpg.stderr.read())
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
