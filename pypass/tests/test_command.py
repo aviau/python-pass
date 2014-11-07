@@ -78,9 +78,7 @@ class TestCommand(unittest.TestCase):
     def test_insert_and_show(self):
         # Insert a password for test.com
         self.run_cli(
-            [
-                'insert', 'test.com'
-            ],
+            ['insert', 'test.com'],
             input='super_secret\nsuper_secret'
         )
 
@@ -90,9 +88,7 @@ class TestCommand(unittest.TestCase):
 
         # Show the password for test.com
         show_result = self.run_cli(
-            [
-                'show', 'test.com'
-            ],
+            ['show', 'test.com'],
             input='super_secret\nsuper_secret'
         )
 
