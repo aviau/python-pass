@@ -30,6 +30,7 @@ Project Status
 ---------------
 
 - [X] ``pypass show test.com`` will display the content of test.com.gpg
+- [ ] ``--clip, -c`` copies the first line to the clipboard
 
 ``pypass ls``
 -------------
@@ -52,3 +53,13 @@ Project Status
 
 - [X] ``pypass find python.org pypass`` will show a tree with password entries that match python.org or pass
 - [X] Accepts one or many search terms
+
+``pypass cp``
+-------------
+
+- [ ] ``pypass cp old-path new-pah`` copies a password to a new path
+
+``pypass mv``
+-------------
+
+- [ ] ``pypass mv old-path new-path`` moves a password to a new path
