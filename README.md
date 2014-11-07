@@ -16,6 +16,7 @@ For fun, I have decided to write [pass](http://www.passwordstore.org/) in Python
 
 - [X] ```pypass insert test.com``` prompts for a password and creates a test.com.gpg file
 - [ ] multi-line support
+- [ ] create a git commit
 
 ### ```pypass show```
 
