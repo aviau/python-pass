@@ -142,3 +142,18 @@ class TestCommand(unittest.TestCase):
         self.run_cli(['rm', '-r', 'test_folder'])
 
         self.assertFalse(os.path.isdir(folder_path))
+
+    def test_find(self):
+        # Create dummy files
+        open(os.path.join(self.dir, 'linux.ca.gpg'), 'a').close()
+        open(os.path.join(self.dir, 'passwordstore.org.gpg'), 'a').close()
+        open(os.path.join(self.dir, 'test.com.gpg'), 'a').close()
+        open(os.path.join(self.dir, 'vv.com.gpg'), 'a').close()
+        open(os.path.join(self.dir, 'zz.com.gpg'), 'a').close()
+
+        find_result = self.run_cli(['find', 'pass', 'vv'])
+
+        expected_regex = \
+            ".*passwordstore.org.gpg\s.*vv.com.gpg"
+
+        self.assertIsNotNone(re.search(expected_regex, find_result.output))

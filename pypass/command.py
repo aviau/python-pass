@@ -187,5 +187,38 @@ def ls(config, subfolder):
         click.echo(tree.stderr.read())
         sys.exit(1)
 
+
+@main.command()
+@click.argument('search_terms', nargs=-1)
+@click.pass_obj
+def find(config, search_terms):
+    click.echo("Search Terms: " + ','.join(search_terms))
+
+    tree = subprocess.Popen(
+        [
+            'tree',
+            '-C',
+            '-l',
+            '--noreport',
+            '-P', '*' + '*|'.join(search_terms) + '*',
+            '--prune',
+            '--matchdirs',
+            '--ignore-case',
+            config['password_store_dir'],
+        ],
+        shell=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    tree.wait()
+
+    if tree.returncode == 0:
+        click.echo(tree.stdout.read(), nl=False)
+    else:
+        click.echo("Tree error:")
+        click.echo(tree.stderr.read())
+        sys.exit(1)
+
+
 if __name__ == '__main__':
     main()

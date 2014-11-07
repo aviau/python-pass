@@ -46,3 +46,9 @@ Project Status
 - [X] ``pypass rm test.com`` removes the test.com.gpg file
 - [ ] ``pypass remove`` and ``pypass delete`` aliases
 - [X] ``pypass rm -r folder`` (or ``--recursive``)  will remove a folder and all of it's content (not interactive!)
+
+``pypass find``
+---------------
+
+- [X] ``pypass find python.org pypass`` fill show a tree with password entries that match python.org or pass
+- [X] Accepts one or many search terms
