@@ -75,7 +75,7 @@ def insert(config, path):
 
     gpg = subprocess.Popen(
         [
-            'gpg2',
+            'gpg',
             '-e',
             '-r', config['gpg-id'],
             '--batch',
@@ -113,7 +113,7 @@ def show(config, path):
 
     gpg = subprocess.Popen(
         [
-            'gpg2',
+            'gpg',
             '--quiet',
             '--batch',
             '--use-agent',
