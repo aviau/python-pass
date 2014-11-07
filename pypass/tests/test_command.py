@@ -128,3 +128,17 @@ class TestCommand(unittest.TestCase):
             result.output,
             'Error: test.com is not in the password store\n'
         )
+
+    def test_rm_recursive(self):
+        folder_path = os.path.join(self.dir, 'test_folder')
+        os.mkdir(folder_path)
+        self.assertTrue(os.path.isdir(folder_path))
+
+        # Create three dummy files
+        open(os.path.join(folder_path, 'linux.ca.gpg'), 'a').close()
+        open(os.path.join(folder_path, 'passwordstore.org.gpg'), 'a').close()
+        open(os.path.join(folder_path, 'test.com.gpg'), 'a').close()
+
+        self.run_cli(['rm', '-r', 'test_folder'])
+
+        self.assertFalse(os.path.isdir(folder_path))

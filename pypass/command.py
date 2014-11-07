@@ -21,6 +21,7 @@ import click
 import os
 import subprocess
 import sys
+import shutil
 
 
 @click.group(invoke_without_command=True)
@@ -105,18 +106,25 @@ def insert(config, path):
 
 
 @main.command()
+@click.option('--recursive', '-r', is_flag=True)
 @click.argument('path', type=click.STRING)
 @click.pass_obj
-def rm(config, path):
-    passfile_path = os.path.realpath(
-        os.path.join(
+def rm(config, recursive, path):
+    resolved_path = os.path.realpath(
+        os.path.join(config['password_store_dir'], path)
+    )
+
+    if os.path.isdir(resolved_path) is False:
+        resolved_path = os.path.join(
             config['password_store_dir'],
             path + '.gpg'
         )
-    )
 
-    if os.path.isfile(passfile_path):
-        os.remove(passfile_path)
+    if os.path.exists(resolved_path):
+        if recursive:
+            shutil.rmtree(resolved_path)
+        else:
+            os.remove(resolved_path)
     else:
         click.echo("Error: %s is not in the password store" % path)
 
