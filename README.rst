@@ -36,6 +36,7 @@ Project Status
 
 - [X] ``pypass ls`` shows the content of the password store with ``tree``
 - [X] ``pypass`` invokes ``pypass ls`` by default
+- [X] ``pypass ls subfolder`` calls tree on the subfolder only
 - [ ] Hide .gpg at the end of each entry
 - [ ] Accept subfolder argument
 

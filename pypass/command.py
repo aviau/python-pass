@@ -163,15 +163,16 @@ def show(config, path):
 
 
 @main.command()
+@click.argument('subfolder', required=False, type=click.STRING, default='')
 @click.pass_obj
-def ls(config):
+def ls(config, subfolder):
     tree = subprocess.Popen(
         [
             'tree',
             '-C',
             '-l',
             '--noreport',
-            config['password_store_dir'],
+            os.path.join(config['password_store_dir'], subfolder),
         ],
         shell=False,
         stdout=subprocess.PIPE,
