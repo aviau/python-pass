@@ -194,13 +194,15 @@ def ls(config, subfolder):
 def find(config, search_terms):
     click.echo("Search Terms: " + ','.join(search_terms))
 
+    pattern = '*' + '*|*'.join(search_terms) + '*'
+
     tree = subprocess.Popen(
         [
             'tree',
             '-C',
             '-l',
             '--noreport',
-            '-P', '*' + '*|'.join(search_terms) + '*',
+            '-P', pattern,
             '--prune',
             '--matchdirs',
             '--ignore-case',
