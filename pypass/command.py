@@ -157,7 +157,7 @@ def ls(config, subfolder):
     tree.wait()
 
     if tree.returncode == 0:
-        click.echo(tree.stdout.read())
+        click.echo(tree.stdout.read().decode('utf8').replace('.gpg', ''))
     else:
         click.echo("Tree error:")
         click.echo(tree.stderr.read())

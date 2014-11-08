@@ -103,7 +103,7 @@ class TestCommand(unittest.TestCase):
         ls_result = self.run_cli(['ls'])
 
         expected_regex = \
-            ".*linux.ca.gpg\s.*passwordstore.org.gpg\s.*test.com.gpg"
+            ".*linux.ca\s.*passwordstore.org\s.*test.com"
 
         self.assertIsNotNone(re.search(expected_regex, ls_result.output))
 
