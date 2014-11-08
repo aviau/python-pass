@@ -3,6 +3,6 @@ python-pass
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
 
+   introduction
    manpage
