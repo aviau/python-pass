@@ -10,7 +10,7 @@ env:
     - TOX_ENV=docs
     - TOX_ENV=coverage
 install:
-    - sudo apt-get install -y gnupg
+    - sudo apt-get install -y gnupg2
     - gpg --allow-secret-key-import --import  pypass/tests/test_key_sec.asc
     - gpg --import-ownertrust pypass/tests/test_ownertrust.txt
     - sudo apt-get install -y tree

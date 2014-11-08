@@ -5,7 +5,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
 RUN apt-get update
-RUN apt-get install -y vim git python-pip tree gnupg python3 pypy
+RUN apt-get install -y vim git python-pip tree gnupg2 python3 pypy
 RUN pip install tox
 
 ADD pypass pypass/pypass
