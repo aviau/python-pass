@@ -9,6 +9,27 @@ python-pass
 
 For fun, I have decided to write `pass <http://www.passwordstore.org/>`_ in Python.
 
+Testing
++++++++
+
+Python-pass is tested for python 2.7, 3.2, 3.3, 3.4, pypy and pypy3
+
+On your machine
+---------------
+
+- Install the requirements: ``sudo apt-get install -y gnupg tree``
+- Import the testing GPG key: ``gpg --allow-secret-key-import --import pypass/tests/test_key_sec.asc``
+- Trust the key: ``gpg --import-ownertrust pypass/tests/test_ownertrust.txt``
+- Run the tests: ``tox``
+
+
+With Docker
+-----------
+
+- Run the tests in a container: ``make test``
+- Or, get a shell with pypass installed: ``make run``
+
+
 Project Status
 ++++++++++++++
 
