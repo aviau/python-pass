@@ -172,6 +172,81 @@ Remove password from store
 Extended Git Example
 --------------------
 
+Here, we initialize new password store, create a git  repository,  and  then manipulate  and sync passwords. Make note of the arguments to the first call of pass git push; consult git-push(1) for more information.
+
+zx2c4@laptop ~ $ pass init Jason@zx2c4.com
+    ::
+
+        mkdir: created directory ‘/home/zx2c4/.password-store’
+        Password store initialized for Jason@zx2c4.com.
+
+zx2c4@laptop ~ $ pass git init
+    ::
+
+        Initialized empty Git repository in /home/zx2c4/.password-store/.git/
+        [master (root-commit) 998c8fd] Added current contents of password store.
+        1 file changed, 1 insertion(+)
+        create mode 100644 .gpg-id
+
+
+zx2c4@laptop ~ $ pass git remote add origin kexec.com:pass-store
+
+zx2c4@laptop ~ $ pass generate Amazon/amazonemail@email.com 21
+    ::
+
+        mkdir: created directory ‘/home/zx2c4/.password-store/Amazon’
+        [master 30fdc1e] Added generated password  for  Amazon/amazonemail@email.com
+        to store.
+        1 file changed, 0 insertions(+), 0 deletions(-)
+        create mode 100644 Amazon/amazonemail@email.com.gpg
+        The generated password to Amazon/amazonemail@email.com is:
+        <5m,_BrZY`antNDxKN<0A
+
+zx2c4@laptop ~ $ pass git push -u --all
+    ::
+        
+        Counting objects: 4, done.
+        Delta compression using up to 2 threads.
+        Compressing objects: 100% (3/3), done.
+        Writing objects: 100% (4/4), 921 bytes, done.
+        Total 4 (delta 0), reused 0 (delta 0)
+        To kexec.com:pass-store
+        * [new branch]      master -> master
+        Branch master set up to track remote branch master from origin.
+
+zx2c4@laptop ~ $ pass insert Amazon/otheraccount@email.com
+    ::
+        
+        Enter          password          for          Amazon/otheraccount@email.com:
+        som3r3a11yb1gp4ssw0rd!!88**
+        [master b9b6746] Added given password for  Amazon/otheraccount@email.com  to
+        store.
+        1 file changed, 0 insertions(+), 0 deletions(-)
+        create mode 100644 Amazon/otheraccount@email.com.gpg
+
+zx2c4@laptop ~ $ pass rm Amazon/amazonemail@email.com
+    ::
+        
+        rm:   remove   regular   file   ‘/home/zx2c4/.password-store/Amazon/amazone‐
+        mail@email.com.gpg’? y
+        removed ‘/home/zx2c4/.password-store/Amazon/amazonemail@email.com.gpg’
+        rm 'Amazon/amazonemail@email.com.gpg'
+        [master 288b379] Removed Amazon/amazonemail@email.com from store.
+        1 file changed, 0 insertions(+), 0 deletions(-)
+        delete mode 100644 Amazon/amazonemail@email.com.gpg
+
+zx2c4@laptop ~ $ pass git push
+    ::
+        
+        Counting objects: 9, done.
+        Delta compression using up to 2 threads.
+        Compressing objects: 100% (5/5), done.
+        Writing objects: 100% (7/7), 1.25 KiB, done.
+        Total 7 (delta 0), reused 0 (delta 0)
+        To kexec.com:pass-store
+
+
+
 Files
 -----
 
