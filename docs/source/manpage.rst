@@ -68,6 +68,107 @@ Version
 Simple Examples
 ---------------
 
+Initialize password store
+    ::
+
+        zx2c4@laptop ~ $ pass init Jason@zx2c4.com
+        mkdir: created directory ‘/home/zx2c4/.password-store’
+        Password store initialized for Jason@zx2c4.com.
+
+List existing passwords in store
+    ::
+
+        zx2c4@laptop ~ $ pass
+        Password Store
+        ├── Business
+        │   ├── some-silly-business-site.com
+        │   └── another-business-site.net
+        ├── Email
+        │   ├── donenfeld.com
+        │   └── zx2c4.com
+        └── France
+        ├── bank
+        ├── freebox
+        └── mobilephone
+
+    Alternatively, "pass ls".
+
+Find existing passwords in store that match .com
+    ::
+
+        zx2c4@laptop ~ $ pass find .com
+        Search Terms: .com
+        ├── Business
+        │   ├── some-silly-business-site.com
+        └── Email
+        ├── donenfeld.com
+        └── zx2c4.com
+
+    Alternatively, "pass search .com".
+
+Show existing password
+    ::
+
+        zx2c4@laptop ~ $ pass Email/zx2c4.com
+        sup3rh4x3rizmynam3
+
+Copy existing password to clipboard
+    ::
+
+        zx2c4@laptop ~ $ pass -c Email/zx2c4.com
+        Copied Email/jason@zx2c4.com to clipboard. Will clear in 45 seconds.
+
+Add password to store
+    ::
+
+        zx2c4@laptop ~ $ pass insert Business/cheese-whiz-factory
+        Enter password for Business/cheese-whiz-factory: omg  so  much  cheese
+        what am i gonna do
+
+Add multiline password to store
+    ::
+
+        zx2c4@laptop ~ $ pass insert -m Business/cheese-whiz-factory
+        Enter  contents  of Business/cheese-whiz-factory and press Ctrl+D when
+        finished:
+
+        Hey this is my
+        awesome
+        multi
+        line
+        passworrrrrrrrd.
+        ^D
+
+Generate new password
+    ::
+
+        zx2c4@laptop ~ $ pass generate Email/jasondonenfeld.com 15
+        The generated password to Email/jasondonenfeld.com is:
+        $(-QF&Q=IN2nFBx
+
+Generate new alphanumeric password
+    ::
+
+        zx2c4@laptop ~ $ pass generate -n Email/jasondonenfeld.com 12
+        The generated password to Email/jasondonenfeld.com is:
+        YqFsMkBeO6di
+
+Generate new password and copy it to the clipboard
+    ::
+
+        zx2c4@laptop ~ $ pass generate -c Email/jasondonenfeld.com 19
+        Copied Email/jasondonenfeld.com to clipboard. Will clear  in  45  sec‐
+        onds.
+
+Remove password from store
+    ::
+
+        zx2c4@laptop ~ $ pass remove Business/cheese-whiz-factory
+        rm:  remove regular file ‘/home/zx2c4/.password-store/Business/cheese-
+        whiz-factory.gpg’? y
+        removed ‘/home/zx2c4/.password-store/Business/cheese-whiz-factory.gpg’
+
+
 Extended Git Example
 --------------------
 
