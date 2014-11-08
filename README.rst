@@ -48,6 +48,7 @@ Project Status
 - [X] ``pypass init`` -  creates a folder and a .gpg-id file
 - [X] Support ``--path`` option
 - [ ] re-encryption functionality
+- [ ] Should output: ``Password store initialized for [gpg-id]``
 
 ``pypass insert``
 -----------------
@@ -70,6 +71,7 @@ Project Status
 - [X] ``pypass ls subfolder`` calls tree on the subfolder only
 - [X] Hide .gpg at the end of each entry
 - [ ] Accept subfolder argument
+- [ ] First output line should be ``Password Store``
 
 ``pypass rm``
 -------------
@@ -77,6 +79,7 @@ Project Status
 - [X] ``pypass rm test.com`` removes the test.com.gpg file
 - [ ] ``pypass remove`` and ``pypass delete`` aliases
 - [X] ``pypass rm -r folder`` (or ``--recursive``)  will remove a folder and all of it's content (not interactive!)
+- [ ] Ask for confirmation
 
 ``pypass find``
 ---------------
@@ -92,4 +95,10 @@ Project Status
 ``pypass mv``
 -------------
 
-- [ ] ``pypass mv old-path new-path`` moves a password to a new path
+- [X] ``pypass mv old-path new-path`` moves a password to a new path
+
+``pypass git``
+--------------
+
+- [ ] Pass commands to git
+- [ ] ``pypass git init`` should behave differently with an existing password store
