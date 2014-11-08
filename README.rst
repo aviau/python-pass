@@ -11,6 +11,11 @@ python-pass
     :target: http://pypass.readthedocs.org
     :alt: Documentation Status
 
+
+.. image:: https://pypip.in/version/pypass/badge.svg
+    :target: https://pypi.python.org/pypi/pypass/
+    :alt: Latest Version
+
 For fun, I have decided to write `pass <http://www.passwordstore.org/>`_ in Python.
 
 Testing
