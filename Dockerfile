@@ -1,5 +1,9 @@
 FROM debian:testing
 
+# Click needs this for python3 support
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
 RUN apt-get update
 RUN apt-get install -y git python-pip tree gnupg python3 pypy
 RUN pip install tox
@@ -13,6 +17,7 @@ ADD README.rst pypass/README.rst
 ADD tox.ini pypass/tox.ini
 ADD .git pypass/.git
 
+# Install testing gpg key
 RUN gpg --allow-secret-key-import --import pypass/pypass/tests/test_key_sec.asc
 RUN gpg --import-ownertrust pypass/pypass/tests/test_ownertrust.txt
 
