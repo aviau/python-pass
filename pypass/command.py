@@ -179,7 +179,7 @@ def find(config, search_terms):
             '-l',
             '--noreport',
             '-P', pattern,
-            '--prune',
+            # '--prune', (tree>=1.5)
             # '--matchdirs', (tree>=1.7)
             # '--ignore-case', (tree>=1.7)
             config['password_store_dir'],
