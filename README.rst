@@ -8,7 +8,7 @@ python-pass
   :target: https://coveralls.io/r/ReAzem/python-pass?branch=master
 
 .. image:: https://readthedocs.org/projects/pypass/badge/?version=latest&style
-    :target: https://readthedocs.org/projects/pypass/?badge=latest
+    :target: http://pypass.readthedocs.org
     :alt: Documentation Status
 
 For fun, I have decided to write `pass <http://www.passwordstore.org/>`_ in Python.
