@@ -106,30 +106,6 @@ def insert(config, path):
 
 
 @main.command()
-@click.option('--recursive', '-r', is_flag=True)
-@click.argument('path', type=click.STRING)
-@click.pass_obj
-def rm(config, recursive, path):
-    resolved_path = os.path.realpath(
-        os.path.join(config['password_store_dir'], path)
-    )
-
-    if os.path.isdir(resolved_path) is False:
-        resolved_path = os.path.join(
-            config['password_store_dir'],
-            path + '.gpg'
-        )
-
-    if os.path.exists(resolved_path):
-        if recursive:
-            shutil.rmtree(resolved_path)
-        else:
-            os.remove(resolved_path)
-    else:
-        click.echo("Error: %s is not in the password store" % path)
-
-
-@main.command()
 @click.argument('path', type=click.STRING)
 @click.pass_obj
 def show(config, path):
@@ -221,6 +197,64 @@ def find(config, search_terms):
         click.echo(tree.stderr.read())
         sys.exit(1)
 
+
+@main.command()
+@click.option('--recursive', '-r', is_flag=True)
+@click.argument('path', type=click.STRING)
+@click.pass_obj
+def rm(config, recursive, path):
+    resolved_path = os.path.realpath(
+        os.path.join(config['password_store_dir'], path)
+    )
+
+    if os.path.isdir(resolved_path) is False:
+        resolved_path = os.path.join(
+            config['password_store_dir'],
+            path + '.gpg'
+        )
+
+    if os.path.exists(resolved_path):
+        if recursive:
+            shutil.rmtree(resolved_path)
+        else:
+            os.remove(resolved_path)
+    else:
+        click.echo("Error: %s is not in the password store" % path)
+
+
+@main.command()
+@click.argument('old_path', type=click.STRING)
+@click.argument('new_path', type=click.STRING)
+@click.pass_obj
+def mv(config, old_path, new_path):
+    resolved_old_path = os.path.realpath(
+        os.path.join(config['password_store_dir'], old_path)
+    )
+
+    if os.path.isdir(resolved_old_path):
+        shutil.move(
+            resolved_old_path,
+            os.path.realpath(
+                os.path.join(config['password_store_dir'], new_path)
+            )
+        )
+    else:
+        resolved_old_path = os.path.realpath(
+            os.path.join(config['password_store_dir'], old_path + '.gpg')
+        )
+
+        if os.path.isfile(resolved_old_path):
+            shutil.move(
+                resolved_old_path,
+                os.path.realpath(
+                    os.path.join(
+                        config['password_store_dir'],
+                        new_path + '.gpg'
+                    )
+                )
+            )
+        else:
+            click.echo("Error: %s is not in the password store" % old_path)
 
 if __name__ == '__main__':
     main()

@@ -143,6 +143,39 @@ class TestCommand(unittest.TestCase):
 
         self.assertFalse(os.path.isdir(folder_path))
 
+    def test_mv_file(self):
+        old_file_path = os.path.join(self.dir, 'move_me.gpg')
+        open(old_file_path, 'a').close()
+
+        self.assertTrue(os.path.isfile(old_file_path))
+
+        self.run_cli(['mv', 'move_me', 'i_moved'])
+
+        self.assertFalse(os.path.isfile(old_file_path))
+        self.assertTrue(os.path.isfile(os.path.join(self.dir, 'i_moved.gpg')))
+
+    def test_mv_folder(self):
+        folder_path = os.path.join(self.dir, 'test_folder')
+        os.mkdir(folder_path)
+        self.assertTrue(os.path.isdir(folder_path))
+
+        # Create three dummy files
+        open(os.path.join(folder_path, 'linux.ca.gpg'), 'a').close()
+        open(os.path.join(folder_path, 'passwordstore.org.gpg'), 'a').close()
+        open(os.path.join(folder_path, 'test.com.gpg'), 'a').close()
+
+        self.run_cli(['mv', 'test_folder', 'moved_folder'])
+
+        self.assertFalse(os.path.isdir(folder_path))
+        self.assertTrue(os.path.isdir(os.path.join(self.dir, 'moved_folder')))
+
+    def test_mv_error(self):
+        mv_result = self.run_cli(['mv', 'test_folder', 'moved_folder'])
+        self.assertEqual(
+            mv_result.output,
+            'Error: test_folder is not in the password store\n'
+        )
+
     def test_find(self):
         # Create dummy files
         open(os.path.join(self.dir, 'linux.ca.gpg'), 'a').close()
