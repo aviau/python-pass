@@ -9,7 +9,7 @@ pypass [COMMAND] [OPTIONS] [ARGS]
 Description
 -----------
 
-pass  is  a  very  simple  password store that keeps passwords inside gpg2(1) encrypted files inside a simple directory tree residing at ~/.password-store.  The pass utility provides a series of commands for manipulating the password store, allowing the user to add, remove, edit, synchronize, generate, and manipulate passwords.
+pypass is a Python implementation of pass,  a  very  simple  password store that keeps passwords inside gpg2(1) encrypted files inside a simple directory tree residing at ~/.password-store.  The pass utility provides a series of commands for manipulating the password store, allowing the user to add, remove, edit, synchronize, generate, and manipulate passwords.
 
 If no COMMAND is specified, COMMAND defaults to either show  or  ls, depending  on  the type of specifier in ARGS. Otherwise COMMAND must be one of the valid commands listed below.
 
@@ -78,7 +78,7 @@ Initialize password store
 List existing passwords in store
     ::
 
-        zx2c4@laptop ~ $ pass
+        zx2c4@laptop ~ $ pypass
         Password Store
         ├── Business
         │   ├── some-silly-business-site.com
@@ -91,12 +91,12 @@ List existing passwords in store
         ├── freebox
         └── mobilephone
 
-    Alternatively, "pass ls".
+    Alternatively, "pypass ls".
 
 Find existing passwords in store that match .com
     ::
 
-        zx2c4@laptop ~ $ pass find .com
+        zx2c4@laptop ~ $ pypass find .com
         Search Terms: .com
         ├── Business
         │   ├── some-silly-business-site.com
@@ -104,31 +104,31 @@ Find existing passwords in store that match .com
         ├── donenfeld.com
         └── zx2c4.com
 
-    Alternatively, "pass search .com".
+    Alternatively, "pypass search .com".
 
 Show existing password
     ::
 
-        zx2c4@laptop ~ $ pass Email/zx2c4.com
+        zx2c4@laptop ~ $ pypass Email/zx2c4.com
         sup3rh4x3rizmynam3
 
 Copy existing password to clipboard
     ::
 
-        zx2c4@laptop ~ $ pass -c Email/zx2c4.com
+        zx2c4@laptop ~ $ pypass -c Email/zx2c4.com
         Copied Email/jason@zx2c4.com to clipboard. Will clear in 45 seconds.
 
 Add password to store
     ::
 
-        zx2c4@laptop ~ $ pass insert Business/cheese-whiz-factory
+        zx2c4@laptop ~ $ pypass insert Business/cheese-whiz-factory
         Enter password for Business/cheese-whiz-factory: omg  so  much  cheese
         what am i gonna do
 
 Add multiline password to store
     ::
 
-        zx2c4@laptop ~ $ pass insert -m Business/cheese-whiz-factory
+        zx2c4@laptop ~ $ pypass insert -m Business/cheese-whiz-factory
         Enter  contents  of Business/cheese-whiz-factory and press Ctrl+D when
         finished:
 
@@ -142,28 +142,28 @@ Add multiline password to store
 Generate new password
     ::
 
-        zx2c4@laptop ~ $ pass generate Email/jasondonenfeld.com 15
+        zx2c4@laptop ~ $ pypass generate Email/jasondonenfeld.com 15
         The generated password to Email/jasondonenfeld.com is:
         $(-QF&Q=IN2nFBx
 
 Generate new alphanumeric password
     ::
 
-        zx2c4@laptop ~ $ pass generate -n Email/jasondonenfeld.com 12
+        zx2c4@laptop ~ $ pypass generate -n Email/jasondonenfeld.com 12
         The generated password to Email/jasondonenfeld.com is:
         YqFsMkBeO6di
 
 Generate new password and copy it to the clipboard
     ::
 
-        zx2c4@laptop ~ $ pass generate -c Email/jasondonenfeld.com 19
+        zx2c4@laptop ~ $ pypass generate -c Email/jasondonenfeld.com 19
         Copied Email/jasondonenfeld.com to clipboard. Will clear  in  45  sec‐
         onds.
 
 Remove password from store
     ::
 
-        zx2c4@laptop ~ $ pass remove Business/cheese-whiz-factory
+        zx2c4@laptop ~ $ pypass remove Business/cheese-whiz-factory
         rm:  remove regular file ‘/home/zx2c4/.password-store/Business/cheese-
         whiz-factory.gpg’? y
         removed ‘/home/zx2c4/.password-store/Business/cheese-whiz-factory.gpg’
@@ -174,13 +174,13 @@ Extended Git Example
 
 Here, we initialize new password store, create a git  repository,  and  then manipulate  and sync passwords. Make note of the arguments to the first call of pass git push; consult git-push(1) for more information.
 
-zx2c4@laptop ~ $ pass init Jason@zx2c4.com
+zx2c4@laptop ~ $ pypass init Jason@zx2c4.com
     ::
 
         mkdir: created directory ‘/home/zx2c4/.password-store’
         Password store initialized for Jason@zx2c4.com.
 
-zx2c4@laptop ~ $ pass git init
+zx2c4@laptop ~ $ pypass git init
     ::
 
         Initialized empty Git repository in /home/zx2c4/.password-store/.git/
@@ -189,9 +189,9 @@ zx2c4@laptop ~ $ pass git init
         create mode 100644 .gpg-id
 
 
-zx2c4@laptop ~ $ pass git remote add origin kexec.com:pass-store
+zx2c4@laptop ~ $ pypass git remote add origin kexec.com:pass-store
 
-zx2c4@laptop ~ $ pass generate Amazon/amazonemail@email.com 21
+zx2c4@laptop ~ $ pypass generate Amazon/amazonemail@email.com 21
     ::
 
         mkdir: created directory ‘/home/zx2c4/.password-store/Amazon’
@@ -202,7 +202,7 @@ zx2c4@laptop ~ $ pass generate Amazon/amazonemail@email.com 21
         The generated password to Amazon/amazonemail@email.com is:
         <5m,_BrZY`antNDxKN<0A
 
-zx2c4@laptop ~ $ pass git push -u --all
+zx2c4@laptop ~ $ pypass git push -u --all
     ::
         
         Counting objects: 4, done.
@@ -214,7 +214,7 @@ zx2c4@laptop ~ $ pass git push -u --all
         * [new branch]      master -> master
         Branch master set up to track remote branch master from origin.
 
-zx2c4@laptop ~ $ pass insert Amazon/otheraccount@email.com
+zx2c4@laptop ~ $ pypass insert Amazon/otheraccount@email.com
     ::
         
         Enter          password          for          Amazon/otheraccount@email.com:
@@ -224,7 +224,7 @@ zx2c4@laptop ~ $ pass insert Amazon/otheraccount@email.com
         1 file changed, 0 insertions(+), 0 deletions(-)
         create mode 100644 Amazon/otheraccount@email.com.gpg
 
-zx2c4@laptop ~ $ pass rm Amazon/amazonemail@email.com
+zx2c4@laptop ~ $ pypass rm Amazon/amazonemail@email.com
     ::
         
         rm:   remove   regular   file   ‘/home/zx2c4/.password-store/Amazon/amazone‐
@@ -235,7 +235,7 @@ zx2c4@laptop ~ $ pass rm Amazon/amazonemail@email.com
         1 file changed, 0 insertions(+), 0 deletions(-)
         delete mode 100644 Amazon/amazonemail@email.com.gpg
 
-zx2c4@laptop ~ $ pass git push
+zx2c4@laptop ~ $ pypass git push
     ::
         
         Counting objects: 9, done.
@@ -274,7 +274,7 @@ PASSWORD_STORE_CLIP_TIME
     Specifies  the number of seconds to wait before restoring the clipboard, by default 45 seconds.
 
 PASSWORD_STORE_UMASK
-    Sets the umask of all files modified by pass, by default 077.
+    Sets the umask of all files modified by pypass, by default 077.
 
 EDITOR 
     The location of the text editor used by edit.
