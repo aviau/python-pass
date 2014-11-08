@@ -25,7 +25,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pypass'
-copyright = u'2014, Alexandre Viau'
+# copyright = u'2014, Alexandre Viau'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -57,7 +57,7 @@ man_pages = [
         'manpage',
         'pypass',
         u'stores, retrieves, generates, and synchronizes passwords securely',
-        [u'Alexandre Viau'],
+        [],
         1
     )
 ]
