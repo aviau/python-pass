@@ -53,8 +53,13 @@ htmlhelp_basename = '%sdoc' % project
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-('manpage', 'pypass', u'stores, retrieves, generates, and synchronizes passwords securely',
-[u'Alexandre Viau'], 1),
+    (
+        'manpage',
+        'pypass',
+        u'stores, retrieves, generates, and synchronizes passwords securely',
+        [u'Alexandre Viau'],
+        1
+    )
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
