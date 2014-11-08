@@ -256,5 +256,29 @@ def mv(config, old_path, new_path):
         else:
             click.echo("Error: %s is not in the password store" % old_path)
 
+
+@main.command()
+@click.argument('commands', nargs=-1)
+@click.pass_obj
+def git(config, commands):
+    os.environ['GIT_DIR'] = os.path.join(config['password_store_dir'], '.git')
+    os.environ['GIT_WORK_TREE'] = config['password_store_dir']
+
+    command_list = list(commands)
+
+    git_result = subprocess.Popen(
+        ['git'] + command_list,
+        shell=False,
+    )
+    git_result.wait()
+
+    # if git_result.returncode == 0:
+    #    click.echo(git_result.stdout.read(), nl=False)
+    # else:
+    #    click.echo("Git error:")
+    #    click.echo(git_result.stderr.read())
+    #    sys.exit(1)
+
+
 if __name__ == '__main__':
     main()
