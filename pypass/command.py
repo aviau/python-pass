@@ -57,9 +57,7 @@ def main(ctx, password_store_dir, password_store_git):
     if os.path.isfile(gpg_id_file):
         config['gpg-id'] = open(gpg_id_file, 'r').read()
 
-    ctx.obj = config
-
-    # Setup env vars
+    # Setup git env vars
     os.environ['GIT_WORK_TREE'] = config['password_store_dir']
 
     if password_store_git:
@@ -67,6 +65,10 @@ def main(ctx, password_store_dir, password_store_git):
     else:
         os.environ['GIT_DIR'] = \
             os.path.join(config['password_store_dir'], '.git')
+
+    config['git_enabled'] = os.path.isdir(os.environ['GIT_DIR'])
+
+    ctx.obj = config
 
     # By default, invoke ls
     if ctx.invoked_subcommand is None:
@@ -125,6 +127,12 @@ def insert(config, path):
     gpg.stdin.write(password.encode())
     gpg.stdin.close()
     gpg.wait()
+
+    if config['git_enabled']:
+        git_add_and_commit(
+            path + '.gpg',
+            message='Added %s to store' % path
+        )
 
 
 @main.command()
