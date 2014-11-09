@@ -48,7 +48,7 @@ class TestCommand(unittest.TestCase):
 
     def test_init(self):
         init_dir = tempfile.mkdtemp()
-        self.run_cli(
+        init_result = self.run_cli(
             [
                 'init',
                 '-p', os.path.join(init_dir, '.password-store'),
@@ -73,6 +73,9 @@ class TestCommand(unittest.TestCase):
             ).read(),
             '5C5833E3'
         )
+
+        self.assertEqual(init_result.output, 'Password store initialized for 5C5833E3.\n')
+
         shutil.rmtree(init_dir)
 
     def test_insert_and_show(self):

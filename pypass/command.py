@@ -59,6 +59,8 @@ def init(path, gpg_id):
     with open(os.path.join(path, '.gpg-id'), 'w') as gpg_id_file:
         gpg_id_file.write(gpg_id)
 
+    click.echo("Password store initialized for %s." % gpg_id)
+
 
 @main.command()
 @click.argument('path', type=click.STRING)

@@ -48,7 +48,7 @@ Project Status
 - [X] ``pypass init`` -  creates a folder and a .gpg-id file
 - [X] Support ``--path`` option
 - [ ] re-encryption functionality
-- [ ] Should output: ``Password store initialized for [gpg-id]``
+- [X] Should output: ``Password store initialized for [gpg-id].``
 
 ``pypass insert``
 -----------------
