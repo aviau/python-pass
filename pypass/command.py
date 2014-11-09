@@ -28,16 +28,29 @@ import shutil
               envvar='PASSWORD_STORE_DIR',
               default=os.path.join(os.getenv("HOME"), ".password-store"),
               type=click.Path(file_okay=False, resolve_path=True))
+@click.option('--PASSWORD_STORE_GIT',
+              envvar='PASSWORD_STORE_GIT',
+              type=click.STRING)
 @click.pass_context
-def main(ctx, password_store_dir):
-    config = {}
-    config['password_store_dir'] = password_store_dir
+def main(ctx, password_store_dir, password_store_git):
+    config = {
+        'password_store_dir': password_store_dir
+    }
 
     gpg_id_file = os.path.join(password_store_dir, '.gpg-id')
     if os.path.isfile(gpg_id_file):
         config['gpg-id'] = open(gpg_id_file, 'r').read()
 
     ctx.obj = config
+
+    os.environ['GIT_WORK_TREE'] = config['password_store_dir']
+
+    # By default, GIT_DIR is password_store_dir.
+    if password_store_git:
+        os.environ['GIT_DIR'] = password_store_git
+    else:
+        os.environ['GIT_DIR'] = \
+            os.path.join(config['password_store_dir'], '.git')
 
     # By default, invoke ls
     if ctx.invoked_subcommand is None:
@@ -251,11 +264,7 @@ def mv(config, old_path, new_path):
 
 @main.command()
 @click.argument('commands', nargs=-1)
-@click.pass_obj
-def git(config, commands):
-    os.environ['GIT_DIR'] = os.path.join(config['password_store_dir'], '.git')
-    os.environ['GIT_WORK_TREE'] = config['password_store_dir']
-
+def git(commands):
     command_list = list(commands)
 
     git_result = subprocess.Popen(
