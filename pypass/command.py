@@ -171,7 +171,7 @@ def find(config, search_terms):
     tree.wait()
 
     if tree.returncode == 0:
-        click.echo(tree.stdout.read(), nl=False)
+        click.echo(tree.stdout.read().decode('utf8').replace('.gpg', ''))
 
 
 @main.command()

@@ -187,6 +187,6 @@ class TestCommand(unittest.TestCase):
         find_result = self.run_cli(['find', 'pass', 'vv'])
 
         expected_regex = \
-            ".*passwordstore.org.gpg\s.*vv.com.gpg"
+            ".*passwordstore.org\s.*vv.com"
 
         self.assertIsNotNone(re.search(expected_regex, find_result.output))
