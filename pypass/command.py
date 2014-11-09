@@ -82,44 +82,33 @@ def main(ctx, password_store_dir, password_store_git):
               help='Where to create the password store.')
 @click.option('--clone', '-c',
               type=click.STRING,
-              default=None,
               help='Git url to clone')
 @click.argument('gpg-id', type=click.STRING)
 def init(path, clone, gpg_id):
-    # Do we have to add gpg-id ?
-    add_gpg_id = True
     # Create a folder at the path
     if not os.path.exists(path):
         os.makedirs(path)
 
     # Clone an existing remote repo
-    if clone is not None:
+    if clone:
         # Init git repo
-        git_result = subprocess.Popen(
-            ["git", "init", path],
-            shell=False,
-        )
-        git_result.wait()
+        subprocess.Popen(["git", "init", path], shell=False).wait()
+
         # Add remote repo
-        git_result = subprocess.Popen(
+        subprocess.Popen(
             ["git", "remote", "add", "origin", clone],
             shell=False,
-        )
-        git_result.wait()
+        ).wait()
+
         # Pull remote repo
         # TODO: add parameters for remote and branch ?
-        git_result = subprocess.Popen(
+        subprocess.Popen(
             ["git", "pull", "origin", "master"],
-            shell=False,
-        )
-        git_result.wait()
+            shell=False
+        ).wait()
 
-    # check if gpgp id is already set
-    with open(os.path.join(path, '.gpg-id'), 'r') as gpg_id_file:
-        if gpg_id_file.read().strip() == gpg_id:
-            add_gpg_id = False
-
-    if add_gpg_id:
+    gpg_id_path = os.path.join(path, '.gpg-id')
+    if os.path.exists(gpg_id_path) is False:
         # Create .gpg_id and put the gpg id in it
         with open(os.path.join(path, '.gpg-id'), 'a') as gpg_id_file:
             gpg_id_file.write(gpg_id)
