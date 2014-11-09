@@ -8,6 +8,9 @@ RUN apt-get update
 RUN apt-get install -y vim git python-pip tree gnupg2 python3 pypy
 RUN pip install tox
 
+RUN git config --global user.email "you@example.com"
+RUN git config --global user.name "Your Name"
+
 ADD pypass pypass/pypass
 ADD docs pypass/docs
 ADD setup.py pypass/setup.py

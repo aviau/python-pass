@@ -20,6 +20,7 @@
 import os
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -196,3 +197,30 @@ class TestCommand(unittest.TestCase):
             "Search\sTerms:\spass,vv\s.*passwordstore.org\s.*vv.com"
 
         self.assertIsNotNone(re.search(expected_regex, find_result.output))
+
+    def test_git_init(self):
+        self.run_cli(['git', 'init'])
+
+        # git init should add a .gitattributes file
+        self.assertEqual(
+            open(os.path.join(self.dir, '.gitattributes'), 'r').read(),
+            '*.gpg diff=gpg\n'
+        )
+
+        # git init should set diff.gpg.binary to True
+        diff_gpg_binary = subprocess.Popen(
+            ['git', 'config', '--local', 'diff.gpg.binary'],
+            shell=False,
+            stdout=subprocess.PIPE
+        )
+        diff_gpg_binary.wait()
+        self.assertEqual(diff_gpg_binary.stdout.read().decode(), 'true\n')
+
+        # git init should set diff.gpg.textconv to 'gpg -d'
+        gpg = subprocess.Popen(
+            ['git', 'config', '--local', 'diff.gpg.textconv'],
+            shell=False,
+            stdout=subprocess.PIPE
+        )
+        gpg.wait()
+        self.assertEqual(gpg.stdout.read().decode(), 'gpg -d\n')

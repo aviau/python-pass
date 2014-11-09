@@ -108,4 +108,4 @@ Project Status
 
 - [X] Pass commands to git
 - [X] ``pypass git init`` should behave differently with an existing password store
-- [ ] Add tests
+- [X] Add tests
