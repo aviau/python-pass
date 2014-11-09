@@ -23,6 +23,21 @@ import subprocess
 import shutil
 
 
+def git_add_and_commit(path, message=None):
+
+    git_add = subprocess.Popen(['git', 'add', path], shell=False)
+    git_add.wait()
+
+    if message:
+        git_commit = subprocess.Popen(
+            ['git', 'commit', '-m', message], shell=False
+        )
+    else:
+        git_commit = subprocess.Popen(['git', 'commit'], shell=False)
+
+    git_commit.wait()
+
+
 @click.group(invoke_without_command=True)
 @click.option('--PASSWORD_STORE_DIR',
               envvar='PASSWORD_STORE_DIR',
@@ -33,6 +48,7 @@ import shutil
               type=click.STRING)
 @click.pass_context
 def main(ctx, password_store_dir, password_store_git):
+    # Prepare the config file
     config = {
         'password_store_dir': password_store_dir
     }
@@ -43,9 +59,9 @@ def main(ctx, password_store_dir, password_store_git):
 
     ctx.obj = config
 
+    # Setup env vars
     os.environ['GIT_WORK_TREE'] = config['password_store_dir']
 
-    # By default, GIT_DIR is password_store_dir.
     if password_store_git:
         os.environ['GIT_DIR'] = password_store_git
     else:
@@ -264,7 +280,8 @@ def mv(config, old_path, new_path):
 
 @main.command()
 @click.argument('commands', nargs=-1)
-def git(commands):
+@click.pass_obj
+def git(config, commands):
     command_list = list(commands)
 
     git_result = subprocess.Popen(
@@ -273,6 +290,31 @@ def git(commands):
     )
     git_result.wait()
 
+    if len(command_list) > 0 and command_list[0] == 'init':
+        git_add_and_commit(
+            '.',
+            message="Add current contents of password store."
+        )
+
+        # Create .gitattributes and commit it
+        with open(
+                os.path.join(
+                    config['password_store_dir'], '.gitattributes'), 'w'
+        ) as gitattributes:
+            gitattributes.write('*.gpg diff=gpg\n')
+
+        git_add_and_commit(
+            '.gitattributes',
+            message="Configure git repository for gpg file diff."
+        )
+
+        subprocess.Popen(
+            ['git', 'config', '--local', 'diff.gpg.binary', 'true'], shell=False
+        ).wait()
+
+        subprocess.Popen(
+            ['git', 'config', '--local', 'diff.gpg.textconv', 'gpg -d'], shell=False
+        ).wait()
 
 if __name__ == '__main__':
     main()
