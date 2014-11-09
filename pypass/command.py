@@ -85,6 +85,9 @@ def main(ctx, password_store_dir, password_store_git):
               help='Git url to clone')
 @click.argument('gpg-id', type=click.STRING)
 def init(path, clone, gpg_id):
+    os.environ['GIT_DIR'] = os.path.join(path, '.git')
+    os.environ['GIT_WORK_TREE'] = path
+
     # Create a folder at the path
     if not os.path.exists(path):
         os.makedirs(path)
