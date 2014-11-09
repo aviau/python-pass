@@ -20,7 +20,6 @@
 import click
 import os
 import subprocess
-import sys
 import shutil
 
 
@@ -89,20 +88,12 @@ def insert(config, path):
             '-o', passfile_path
         ],
         shell=False,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        stdin=subprocess.PIPE
     )
 
     gpg.stdin.write(password.encode())
     gpg.stdin.close()
     gpg.wait()
-
-    # Check for gpg errors
-    if gpg.returncode != 0:
-        click.echo("GPG error:")
-        click.echo(gpg.stderr.read())
-        sys.exit(1)
 
 
 @main.command()
@@ -125,17 +116,12 @@ def show(config, path):
             '-d', passfile_path,
         ],
         shell=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        stdout=subprocess.PIPE
     )
     gpg.wait()
 
     if gpg.returncode == 0:
         click.echo(gpg.stdout.read())
-    else:
-        click.echo("GPG error:")
-        click.echo(gpg.stderr.read())
-        sys.exit(1)
 
 
 @main.command()
@@ -151,17 +137,12 @@ def ls(config, subfolder):
             os.path.join(config['password_store_dir'], subfolder),
         ],
         shell=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        stdout=subprocess.PIPE
     )
     tree.wait()
 
     if tree.returncode == 0:
         click.echo(tree.stdout.read().decode('utf8').replace('.gpg', ''))
-    else:
-        click.echo("Tree error:")
-        click.echo(tree.stderr.read())
-        sys.exit(1)
 
 
 @main.command()
@@ -185,17 +166,12 @@ def find(config, search_terms):
             config['password_store_dir'],
         ],
         shell=False,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        stdout=subprocess.PIPE
     )
     tree.wait()
 
     if tree.returncode == 0:
         click.echo(tree.stdout.read(), nl=False)
-    else:
-        click.echo("Tree error:")
-        click.echo(tree.stderr.read())
-        sys.exit(1)
 
 
 @main.command()
@@ -271,13 +247,6 @@ def git(config, commands):
         shell=False,
     )
     git_result.wait()
-
-    # if git_result.returncode == 0:
-    #    click.echo(git_result.stdout.read(), nl=False)
-    # else:
-    #    click.echo("Git error:")
-    #    click.echo(git_result.stderr.read())
-    #    sys.exit(1)
 
 
 if __name__ == '__main__':
