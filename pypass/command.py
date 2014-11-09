@@ -309,11 +309,13 @@ def git(config, commands):
         )
 
         subprocess.Popen(
-            ['git', 'config', '--local', 'diff.gpg.binary', 'true'], shell=False
+            ['git', 'config', '--local', 'diff.gpg.binary', 'true'],
+            shell=False
         ).wait()
 
         subprocess.Popen(
-            ['git', 'config', '--local', 'diff.gpg.textconv', 'gpg -d'], shell=False
+            ['git', 'config', '--local', 'diff.gpg.textconv', 'gpg -d'],
+            shell=False
         ).wait()
 
 if __name__ == '__main__':
