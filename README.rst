@@ -38,6 +38,12 @@ With Docker
 - Run the tests in a container: ``make test``
 - Or, get a shell with pypass installed: ``make run``
 
+Documentation
++++++++++++++
+
+Documentation for python-pass is available on `pypass.rtfd.org <http://pypass.readthedocs.org/>`_ .
+
+You can build the documentation and the man page yourself with ``tox -edocs``. The HTML documentation will be built in ``docs/build/html`` and the man page will be built in ``docs/build/man``.
 
 Project Status
 ++++++++++++++
