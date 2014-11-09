@@ -144,7 +144,15 @@ def ls(config, subfolder):
     tree.wait()
 
     if tree.returncode == 0:
-        click.echo(tree.stdout.read().decode('utf8').replace('.gpg', ''))
+        output_without_gpg = \
+            tree.stdout.read().decode('utf8').replace('.gpg', '')
+
+        output_replaced_first_line =\
+            "Password Store\n" + '\n'.join(output_without_gpg.split('\n')[1:])
+
+        output_stripped = output_replaced_first_line.strip()
+
+        click.echo(output_stripped)
 
 
 @main.command()
@@ -173,7 +181,13 @@ def find(config, search_terms):
     tree.wait()
 
     if tree.returncode == 0:
-        click.echo(tree.stdout.read().decode('utf8').replace('.gpg', ''))
+        output_without_gpg = \
+            tree.stdout.read().decode('utf8').replace('.gpg', '')
+
+        output_without_first_line =\
+            '\n'.join(output_without_gpg.split('\n')[1:]).strip()
+
+        click.echo(output_without_first_line)
 
 
 @main.command()
