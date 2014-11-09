@@ -41,7 +41,7 @@ With Docker
 Documentation
 +++++++++++++
 
-Documentation for python-pass is available on `pypass.rtfd.org <http://pypass.readthedocs.org/>`_ .
+Documentation for python-pass is available on `pypass.rtfd.org <http://pypass.readthedocs.org/>`_.
 
 You can build the documentation and the man page yourself with ``tox -edocs``. The HTML documentation will be built in ``docs/build/html`` and the man page will be built in ``docs/build/man``.
 
