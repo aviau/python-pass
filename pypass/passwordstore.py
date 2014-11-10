@@ -41,4 +41,13 @@ class PasswordStore(object):
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store"""
-        raise NotImplemented()
+        passwords = []
+
+        for root, dirnames, filenames in os.walk(self.path):
+            for filename in filenames:
+                if filename.endswith('.gpg'):
+                    path = os.path.join(root, filename.replace('.gpg', ''))
+                    simplified_path = path.replace(self.path + '/', '')
+                    passwords.append(simplified_path)
+
+        return passwords
