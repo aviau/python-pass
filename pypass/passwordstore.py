@@ -76,7 +76,7 @@ class PasswordStore(object):
         gpg.wait()
 
         if gpg.returncode == 0:
-            return gpg.stdout.read()
+            return gpg.stdout.read().decode()
 
     def insert_password(self, path, password):
         """Encrypts the password to the given path"""
@@ -102,3 +102,62 @@ class PasswordStore(object):
         gpg.stdin.write(password.encode())
         gpg.stdin.close()
         gpg.wait()
+
+    @staticmethod
+    def init(gpg_id, path, clone_url=None):
+        """Creates a password store to the given path"""
+        git_dir = os.path.join(path, '.git')
+        git_work_tree = path
+
+        # Create a folder at the path
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        # Clone an existing remote repo
+        if clone_url:
+            # Init git repo
+            subprocess.Popen(
+                [
+                    "git",
+                    "--git-dir=%s" % git_dir,
+                    "--work-tree=%s" % git_work_tree,
+                    "init", path
+                ],
+                shell=False
+            ).wait()
+
+            # Add remote repo
+            subprocess.Popen(
+                [
+                    "git",
+                    "--git-dir=%s" % git_dir,
+                    "--work-tree=%s" % git_work_tree,
+                    "remote",
+                    "add",
+                    "origin",
+                    clone_url
+                ],
+                shell=False,
+            ).wait()
+
+            # Pull remote repo
+            # TODO: add parameters for remote and branch ?
+            subprocess.Popen(
+                [
+                    "git",
+                    "--git-dir=%s" % git_dir,
+                    "--work-tree=%s" % git_work_tree,
+                    "pull",
+                    "origin",
+                    "master"
+                ],
+                shell=False
+            ).wait()
+
+        gpg_id_path = os.path.join(path, '.gpg-id')
+        if os.path.exists(gpg_id_path) is False:
+            # Create .gpg_id and put the gpg id in it
+            with open(os.path.join(path, '.gpg-id'), 'a') as gpg_id_file:
+                gpg_id_file.write(gpg_id)
+
+        return PasswordStore(path)

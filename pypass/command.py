@@ -81,37 +81,7 @@ def main(ctx, password_store_dir, password_store_git):
               help='Git url to clone')
 @click.argument('gpg-id', type=click.STRING)
 def init(path, clone, gpg_id):
-    os.environ['GIT_DIR'] = os.path.join(path, '.git')
-    os.environ['GIT_WORK_TREE'] = path
-
-    # Create a folder at the path
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-    # Clone an existing remote repo
-    if clone:
-        # Init git repo
-        subprocess.Popen(["git", "init", path], shell=False).wait()
-
-        # Add remote repo
-        subprocess.Popen(
-            ["git", "remote", "add", "origin", clone],
-            shell=False,
-        ).wait()
-
-        # Pull remote repo
-        # TODO: add parameters for remote and branch ?
-        subprocess.Popen(
-            ["git", "pull", "origin", "master"],
-            shell=False
-        ).wait()
-
-    gpg_id_path = os.path.join(path, '.gpg-id')
-    if os.path.exists(gpg_id_path) is False:
-        # Create .gpg_id and put the gpg id in it
-        with open(os.path.join(path, '.gpg-id'), 'a') as gpg_id_file:
-            gpg_id_file.write(gpg_id)
-
+    PasswordStore.init(gpg_id, path, clone_url=clone)
     click.echo("Password store initialized for %s." % gpg_id)
 
 
