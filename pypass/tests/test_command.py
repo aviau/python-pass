@@ -192,7 +192,9 @@ class TestCommand(unittest.TestCase):
         self.run_cli(['cp', 'copy_me', 'i_was_copied'])
 
         self.assertTrue(os.path.isfile(old_file_path))
-        self.assertTrue(os.path.isfile(os.path.join(self.dir, 'i_was_copied.gpg')))
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.dir, 'i_was_copied.gpg'))
+        )
 
     def test_cp_folder(self):
         folder_path = os.path.join(self.dir, 'test_folder')
