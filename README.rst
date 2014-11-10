@@ -55,6 +55,7 @@ Project Status
 - [X] Support ``--path`` option
 - [ ] re-encryption functionality
 - [X] Should output: ``Password store initialized for [gpg-id].``
+- [X} ``--clone <url>`` allows to init from an existing repo
 
 ``pypass insert``
 -----------------
