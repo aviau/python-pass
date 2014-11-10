@@ -17,7 +17,6 @@ ADD setup.py pypass/setup.py
 ADD setup.cfg pypass/setup.cfg
 ADD requirements.txt pypass/requirements.txt
 ADD test-requirements.txt pypass/test-requirements.txt
-ADD docs-requirements.txt pypass/docs-requirements.txt
 ADD README.rst pypass/README.rst
 ADD tox.ini pypass/tox.ini
 ADD .git pypass/.git
