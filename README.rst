@@ -18,6 +18,8 @@ python-pass
 
 For fun, I have decided to write `pass <http://www.passwordstore.org/>`_ in Python.
 
+Python-pass will provide the same functionality as `pass <http://www.passwordstore.org/>`_. In addition, it will be usable as a library.
+
 Testing
 +++++++
 
