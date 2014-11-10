@@ -47,7 +47,7 @@ class TestPasswordStore(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir)
 
-    def test_init(self):
+    def test_constructor(self):
         store = PasswordStore(self.dir)
         self.assertEqual(store.gpg_id, '5C5833E3')
         self.assertFalse(store.uses_git)
@@ -82,3 +82,30 @@ class TestPasswordStore(unittest.TestCase):
             password,
             store.get_decypted_password('hello.com')
         )
+
+    def test_init(self):
+        init_dir = tempfile.mkdtemp()
+        PasswordStore.init(
+            '5C5833E3',
+            path=os.path.join(init_dir, '.password-store')
+        )
+
+        self.assertTrue(
+            os.path.isdir(os.path.join(init_dir, '.password-store'))
+        )
+
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(init_dir, '.password-store', '.gpg-id')
+            )
+        )
+
+        self.assertEqual(
+            open(
+                os.path.join(init_dir, '.password-store', '.gpg-id'),
+                'r'
+            ).read(),
+            '5C5833E3'
+        )
+
+        shutil.rmtree(init_dir)
