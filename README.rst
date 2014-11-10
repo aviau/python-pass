@@ -79,8 +79,8 @@ Project Status
 - [X] ``pypass`` invokes ``pypass ls`` by default
 - [X] ``pypass ls subfolder`` calls tree on the subfolder only
 - [X] Hide .gpg at the end of each entry
-- [ ] Accept subfolder argument
-- [ ] First output line should be ``Password Store``
+- [X] Accept subfolder argument
+- [X] First output line should be ``Password Store``
 
 ``pypass rm``
 -------------
