@@ -20,6 +20,7 @@
 import unittest
 import os
 import shutil
+import subprocess
 import tempfile
 
 from pypass.passwordstore import PasswordStore
@@ -109,3 +110,63 @@ class TestPasswordStore(unittest.TestCase):
         )
 
         shutil.rmtree(init_dir)
+
+    def test_init_clone(self):
+        origin_dir = tempfile.mkdtemp()
+        destination_dir = tempfile.mkdtemp()
+
+        subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--work-tree=%s' % origin_dir,
+                'init',
+                origin_dir
+            ],
+            shell=False
+        ).wait()
+
+        open(os.path.join(origin_dir, 'test_git_init_clone.gpg'), 'a').close()
+
+        subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--work-tree=%s' % origin_dir,
+                'add', 'test_git_init_clone.gpg',
+            ]
+        ).wait()
+
+        subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--work-tree=%s' % origin_dir,
+                'commit',
+                '-m', '"testcommit"',
+            ]
+        ).wait()
+
+        # Init
+        PasswordStore.init(
+            path=destination_dir,
+            clone_url=origin_dir,
+            gpg_id='3CCC3A3A'
+        )
+
+        # The key should be imported
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(destination_dir, 'test_git_init_clone.gpg')
+            )
+        )
+
+        # The gpg-id file should be created
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(destination_dir, '.gpg-id')
+            )
+        )
+
+        shutil.rmtree(origin_dir)
+        shutil.rmtree(destination_dir)
