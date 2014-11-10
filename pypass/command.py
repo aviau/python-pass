@@ -50,6 +50,11 @@ def git_add_and_commit(path, message=None):
               type=click.STRING)
 @click.pass_context
 def main(ctx, password_store_dir, password_store_git):
+
+    # init does not need any of this.
+    if ctx.invoked_subcommand == "init":
+        return
+
     # Prepare the config file
     config = {
         'password_store': PasswordStore(path=password_store_dir)
