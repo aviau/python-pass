@@ -56,11 +56,11 @@ class TestPasswordStore(unittest.TestCase):
     def test_get_passwords_list(self):
         store = PasswordStore(self.dir)
         self.assertListEqual(
-            store.get_passwords_list(),
-            [
+            sorted(store.get_passwords_list()),
+            sorted([
                 'test.com',
                 'linux.ca',
                 'passwordstore.org',
                 'Email/email.com',
-            ]
+            ])
         )
