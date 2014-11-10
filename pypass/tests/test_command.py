@@ -224,3 +224,63 @@ class TestCommand(unittest.TestCase):
         )
         gpg.wait()
         self.assertEqual(gpg.stdout.read().decode(), 'gpg -d\n')
+
+    def test_git_init_clone(self):
+        # Setup origin repo
+        origin_dir = tempfile.mkdtemp()
+
+        subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--work-tree=%s' % origin_dir,
+                'init',
+                origin_dir
+            ],
+            shell=False
+        ).wait()
+
+        open(os.path.join(origin_dir, 'test_git_init_clone.gpg'), 'a').close()
+
+        subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--work-tree=%s' % origin_dir,
+                'add', 'test_git_init_clone.gpg',
+            ]
+        ).wait()
+
+        subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--work-tree=%s' % origin_dir,
+                'commit',
+                '-m', '"testcommit"',
+            ]
+        ).wait()
+
+        # Init
+        self.run_cli(
+            [
+                'init',
+                '--path', self.dir,
+                '--clone', origin_dir,
+                'TEST_GPG_ID'
+            ]
+        )
+
+        # The key should be imported
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(self.dir, 'test_git_init_clone.gpg')
+            )
+        )
+
+        # The gpg-id file should be created
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(self.dir, '.gpg-id')
+            )
+        )
