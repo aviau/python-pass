@@ -22,6 +22,8 @@ import os
 import subprocess
 import shutil
 
+from pypass.passwordstore import PasswordStore
+
 
 def git_add_and_commit(path, message=None):
 
@@ -50,23 +52,17 @@ def git_add_and_commit(path, message=None):
 def main(ctx, password_store_dir, password_store_git):
     # Prepare the config file
     config = {
-        'password_store_dir': password_store_dir
+        'password_store': PasswordStore(path=password_store_dir)
     }
 
-    gpg_id_file = os.path.join(password_store_dir, '.gpg-id')
-    if os.path.isfile(gpg_id_file):
-        config['gpg-id'] = open(gpg_id_file, 'r').read()
-
     # Setup git env vars
-    os.environ['GIT_WORK_TREE'] = config['password_store_dir']
+    os.environ['GIT_WORK_TREE'] = config['password_store'].path
 
     if password_store_git:
         os.environ['GIT_DIR'] = password_store_git
     else:
         os.environ['GIT_DIR'] = \
-            os.path.join(config['password_store_dir'], '.git')
-
-    config['git_enabled'] = os.path.isdir(os.environ['GIT_DIR'])
+            os.path.join(config['password_store'].path, '.git')
 
     ctx.obj = config
 
@@ -125,7 +121,7 @@ def init(path, clone, gpg_id):
 def insert(config, path):
     passfile_path = os.path.realpath(
         os.path.join(
-            config['password_store_dir'],
+            config['password_store'].path,
             path + '.gpg'
         )
     )
@@ -140,7 +136,7 @@ def insert(config, path):
         [
             'gpg2',
             '-e',
-            '-r', config['gpg-id'],
+            '-r', config['password_store'].gpg_id,
             '--batch',
             '--use-agent',
             '--no-tty',
@@ -154,7 +150,7 @@ def insert(config, path):
     gpg.stdin.close()
     gpg.wait()
 
-    if config['git_enabled']:
+    if config['password_store'].uses_git:
         git_add_and_commit(
             path + '.gpg',
             message='Added %s to store' % path
@@ -167,7 +163,7 @@ def insert(config, path):
 def show(config, path):
     passfile_path = os.path.realpath(
         os.path.join(
-            config['password_store_dir'],
+            config['password_store'].path,
             path + '.gpg'
         )
     )
@@ -199,7 +195,7 @@ def ls(config, subfolder):
             '-C',
             '-l',
             '--noreport',
-            os.path.join(config['password_store_dir'], subfolder),
+            os.path.join(config['password_store'].path, subfolder),
         ],
         shell=False,
         stdout=subprocess.PIPE
@@ -236,7 +232,7 @@ def find(config, search_terms):
             # '--prune', (tree>=1.5)
             # '--matchdirs', (tree>=1.7)
             # '--ignore-case', (tree>=1.7)
-            config['password_store_dir'],
+            config['password_store'].path,
         ],
         shell=False,
         stdout=subprocess.PIPE
@@ -259,12 +255,12 @@ def find(config, search_terms):
 @click.pass_obj
 def rm(config, recursive, path):
     resolved_path = os.path.realpath(
-        os.path.join(config['password_store_dir'], path)
+        os.path.join(config['password_store'].path, path)
     )
 
     if os.path.isdir(resolved_path) is False:
         resolved_path = os.path.join(
-            config['password_store_dir'],
+            config['password_store'].path,
             path + '.gpg'
         )
 
@@ -283,19 +279,19 @@ def rm(config, recursive, path):
 @click.pass_obj
 def mv(config, old_path, new_path):
     resolved_old_path = os.path.realpath(
-        os.path.join(config['password_store_dir'], old_path)
+        os.path.join(config['password_store'].path, old_path)
     )
 
     if os.path.isdir(resolved_old_path):
         shutil.move(
             resolved_old_path,
             os.path.realpath(
-                os.path.join(config['password_store_dir'], new_path)
+                os.path.join(config['password_store'].path, new_path)
             )
         )
     else:
         resolved_old_path = os.path.realpath(
-            os.path.join(config['password_store_dir'], old_path + '.gpg')
+            os.path.join(config['password_store'].path, old_path + '.gpg')
         )
 
         if os.path.isfile(resolved_old_path):
@@ -303,7 +299,7 @@ def mv(config, old_path, new_path):
                 resolved_old_path,
                 os.path.realpath(
                     os.path.join(
-                        config['password_store_dir'],
+                        config['password_store'].path,
                         new_path + '.gpg'
                     )
                 )
@@ -333,7 +329,7 @@ def git(config, commands):
         # Create .gitattributes and commit it
         with open(
                 os.path.join(
-                    config['password_store_dir'], '.gitattributes'), 'w'
+                    config['password_store'].path, '.gitattributes'), 'w'
         ) as gitattributes:
             gitattributes.write('*.gpg diff=gpg\n')
 
