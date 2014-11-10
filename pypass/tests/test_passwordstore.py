@@ -64,3 +64,21 @@ class TestPasswordStore(unittest.TestCase):
                 'Email/email.com',
             ])
         )
+
+    def test_encrypt_decrypt(self):
+        self.assertFalse(
+            os.path.isfile(os.path.join(self.dir, 'hello.com.gpg'))
+        )
+
+        store = PasswordStore(self.dir)
+        password = 'ELLO'
+        store.insert_password('hello.com', password)
+
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.dir, 'hello.com.gpg'))
+        )
+
+        self.assertEqual(
+            password,
+            store.get_decypted_password('hello.com')
+        )
