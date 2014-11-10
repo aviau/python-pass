@@ -277,6 +277,41 @@ def rm(config, recursive, path):
 @click.argument('old_path', type=click.STRING)
 @click.argument('new_path', type=click.STRING)
 @click.pass_obj
+def cp(config, old_path, new_path):
+    resolved_old_path = os.path.realpath(
+        os.path.join(config['password_store'].path, old_path)
+    )
+
+    if os.path.isdir(resolved_old_path):
+        shutil.copytree(
+            resolved_old_path,
+            os.path.realpath(
+                os.path.join(config['password_store'].path, new_path)
+            )
+        )
+    else:
+        resolved_old_path = os.path.realpath(
+            os.path.join(config['password_store'].path, old_path + '.gpg')
+        )
+
+        if os.path.isfile(resolved_old_path):
+            shutil.copy(
+                resolved_old_path,
+                os.path.realpath(
+                    os.path.join(
+                        config['password_store'].path,
+                        new_path + '.gpg'
+                    )
+                )
+            )
+        else:
+            click.echo("Error: %s is not in the password store" % old_path)
+
+
+@main.command()
+@click.argument('old_path', type=click.STRING)
+@click.argument('new_path', type=click.STRING)
+@click.pass_obj
 def mv(config, old_path, new_path):
     resolved_old_path = os.path.realpath(
         os.path.join(config['password_store'].path, old_path)

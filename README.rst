@@ -97,7 +97,7 @@ Project Status
 ``pypass cp``
 -------------
 
-- [ ] ``pypass cp old-path new-pah`` copies a password to a new path
+- [X] ``pypass cp old-path new-pah`` copies a password to a new path
 
 ``pypass mv``
 -------------
