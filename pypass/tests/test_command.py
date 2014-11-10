@@ -260,7 +260,7 @@ class TestCommand(unittest.TestCase):
         gpg.wait()
         self.assertEqual(gpg.stdout.read().decode(), 'gpg -d\n')
 
-    def test_git_init_clone(self):
+    def test_init_clone(self):
         # Setup origin repo
         origin_dir = tempfile.mkdtemp()
 
