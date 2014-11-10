@@ -5,4 +5,5 @@ python-pass
    :maxdepth: 2
 
    introduction
+   API
    manpage

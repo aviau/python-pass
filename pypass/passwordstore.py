@@ -21,6 +21,7 @@ import os
 
 
 class PasswordStore(object):
+    """This is a Password Store"""
 
     def __init__(
             self,
@@ -39,4 +40,5 @@ class PasswordStore(object):
         )
 
     def get_passwords_list(self):
+        """Returns a list of the passwords in the store"""
         raise NotImplemented()
