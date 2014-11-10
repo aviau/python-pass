@@ -119,36 +119,13 @@ def init(path, clone, gpg_id):
 @click.argument('path', type=click.STRING)
 @click.pass_obj
 def insert(config, path):
-    passfile_path = os.path.realpath(
-        os.path.join(
-            config['password_store'].path,
-            path + '.gpg'
-        )
-    )
-
     password = click.prompt(
         'Enter the password',
         type=str,
         confirmation_prompt=True
     )
 
-    gpg = subprocess.Popen(
-        [
-            'gpg2',
-            '-e',
-            '-r', config['password_store'].gpg_id,
-            '--batch',
-            '--use-agent',
-            '--no-tty',
-            '-o', passfile_path
-        ],
-        shell=False,
-        stdin=subprocess.PIPE
-    )
-
-    gpg.stdin.write(password.encode())
-    gpg.stdin.close()
-    gpg.wait()
+    config['password_store'].insert_password(path, password)
 
     if config['password_store'].uses_git:
         git_add_and_commit(
@@ -161,28 +138,9 @@ def insert(config, path):
 @click.argument('path', type=click.STRING)
 @click.pass_obj
 def show(config, path):
-    passfile_path = os.path.realpath(
-        os.path.join(
-            config['password_store'].path,
-            path + '.gpg'
-        )
+    click.echo(
+        config['password_store'].get_decypted_password(path).strip(),
     )
-
-    gpg = subprocess.Popen(
-        [
-            'gpg2',
-            '--quiet',
-            '--batch',
-            '--use-agent',
-            '-d', passfile_path,
-        ],
-        shell=False,
-        stdout=subprocess.PIPE
-    )
-    gpg.wait()
-
-    if gpg.returncode == 0:
-        click.echo(gpg.stdout.read())
 
 
 @main.command()

@@ -18,6 +18,7 @@
 #
 
 import os
+import subprocess
 
 
 class PasswordStore(object):
@@ -51,3 +52,53 @@ class PasswordStore(object):
                     passwords.append(simplified_path)
 
         return passwords
+
+    def get_decypted_password(self, path):
+        """Returns the content of the decrypted password file"""
+        passfile_path = os.path.realpath(
+            os.path.join(
+                self.path,
+                path + '.gpg'
+            )
+        )
+
+        gpg = subprocess.Popen(
+            [
+                'gpg2',
+                '--quiet',
+                '--batch',
+                '--use-agent',
+                '-d', passfile_path,
+            ],
+            shell=False,
+            stdout=subprocess.PIPE
+        )
+        gpg.wait()
+
+        if gpg.returncode == 0:
+            return gpg.stdout.read()
+
+    def insert_password(self, path, password):
+        """Encrypts the password to the given path"""
+
+        passfile_path = os.path.realpath(
+            os.path.join(self.path, path + '.gpg')
+        )
+
+        gpg = subprocess.Popen(
+            [
+                'gpg2',
+                '-e',
+                '-r', self.gpg_id,
+                '--batch',
+                '--use-agent',
+                '--no-tty',
+                '-o', passfile_path
+            ],
+            shell=False,
+            stdin=subprocess.PIPE
+        )
+
+        gpg.stdin.write(password.encode())
+        gpg.stdin.close()
+        gpg.wait()
