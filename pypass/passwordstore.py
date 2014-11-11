@@ -45,14 +45,18 @@ class PasswordStore(object):
     ):
         self.path = path
 
+        # Read the .gpg-id
         gpg_id_file = os.path.join(path, '.gpg-id')
         if os.path.isfile(gpg_id_file):
             self.gpg_id = open(gpg_id_file, 'r').read()
         else:
             raise Exception("could not find .gpg-id file")
 
-        self.git_dir = git_dir or os.path.join(self.path, '.git')
-        self.uses_git = os.path.isdir(self.git_dir)
+        # Try to locate the git dir
+        git_dir = git_dir or os.path.join(self.path, '.git')
+        self.uses_git = os.path.isdir(git_dir)
+        if self.uses_git:
+            self.git_dir = git_dir
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store"""
@@ -130,7 +134,7 @@ class PasswordStore(object):
         # Clone an existing remote repo
         if clone_url:
             # Init git repo
-            subprocess.Popen(
+            subprocess.call(
                 [
                     "git",
                     "--git-dir=%s" % git_dir,
@@ -138,10 +142,10 @@ class PasswordStore(object):
                     "init", path
                 ],
                 shell=False
-            ).wait()
+            )
 
             # Add remote repo
-            subprocess.Popen(
+            subprocess.call(
                 [
                     "git",
                     "--git-dir=%s" % git_dir,
@@ -152,11 +156,11 @@ class PasswordStore(object):
                     clone_url
                 ],
                 shell=False,
-            ).wait()
+            )
 
             # Pull remote repo
             # TODO: add parameters for remote and branch ?
-            subprocess.Popen(
+            subprocess.call(
                 [
                     "git",
                     "--git-dir=%s" % git_dir,
@@ -166,7 +170,7 @@ class PasswordStore(object):
                     "master"
                 ],
                 shell=False
-            ).wait()
+            )
 
         gpg_id_path = os.path.join(path, '.gpg-id')
         if os.path.exists(gpg_id_path) is False:
@@ -176,9 +180,67 @@ class PasswordStore(object):
 
         return PasswordStore(path)
 
+    def git_init(self, git_dir=None):
+        """Transform  the existing password store into a git repository"""
+
+        self.git_dir = git_dir or os.path.join(self.path, '.git')
+        self.uses_git = True
+
+        subprocess.call(
+            [
+                'git',
+                "--git-dir=%s" % self.git_dir,
+                "--work-tree=%s" % self.path,
+                'init',
+            ],
+            shell=False
+        )
+
+        self.git_add_and_commit(
+            '.',
+            message="Add current contents of password store."
+        )
+
+        # Create .gitattributes and commit it
+        with open(
+                os.path.join(self.path, '.gitattributes'), 'w'
+        ) as gitattributes:
+            gitattributes.write('*.gpg diff=gpg\n')
+
+        self.git_add_and_commit(
+            '.gitattributes',
+            message="Configure git repository for gpg file diff."
+        )
+
+        subprocess.call(
+            [
+                'git',
+                "--git-dir=%s" % self.git_dir,
+                "--work-tree=%s" % self.path,
+                'config',
+                '--local',
+                'diff.gpg.binary',
+                'true'
+            ],
+            shell=False
+        )
+
+        subprocess.call(
+            [
+                'git',
+                "--git-dir=%s" % self.git_dir,
+                "--work-tree=%s" % self.path,
+                'config',
+                '--local',
+                'diff.gpg.textconv',
+                'gpg -d'
+            ],
+            shell=False
+        )
+
     def git_add_and_commit(self, path, message=None):
 
-        git_add = subprocess.Popen(
+        subprocess.call(
             [
                 'git',
                 "--git-dir=%s" % self.git_dir,
@@ -188,10 +250,9 @@ class PasswordStore(object):
             ],
             shell=False
         )
-        git_add.wait()
 
         if message:
-            git_commit = subprocess.Popen(
+            subprocess.call(
                 [
                     'git',
                     "--git-dir=%s" % self.git_dir,
@@ -203,7 +264,7 @@ class PasswordStore(object):
                 shell=False
             )
         else:
-            git_commit = subprocess.Popen(
+            subprocess.call(
                 [
                     'git',
                     "--git-dir=%s" % self.git_dir,
@@ -212,5 +273,3 @@ class PasswordStore(object):
                 ],
                 shell=False
             )
-
-        git_commit.wait()

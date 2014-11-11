@@ -270,39 +270,15 @@ def mv(config, old_path, new_path):
 def git(config, commands):
     command_list = list(commands)
 
-    git_result = subprocess.Popen(
-        ['git'] + command_list,
-        shell=False,
-    )
-    git_result.wait()
-
     if len(command_list) > 0 and command_list[0] == 'init':
-        config['password_store'].git_add_and_commit(
-            '.',
-            message="Add current contents of password store."
+        config['password_store'].git_init()
+    else:
+        git_result = subprocess.Popen(
+            ['git'] + command_list,
+            shell=False,
         )
+        git_result.wait()
 
-        # Create .gitattributes and commit it
-        with open(
-                os.path.join(
-                    config['password_store'].path, '.gitattributes'), 'w'
-        ) as gitattributes:
-            gitattributes.write('*.gpg diff=gpg\n')
-
-        config['password_store'].git_add_and_commit(
-            '.gitattributes',
-            message="Configure git repository for gpg file diff."
-        )
-
-        subprocess.Popen(
-            ['git', 'config', '--local', 'diff.gpg.binary', 'true'],
-            shell=False
-        ).wait()
-
-        subprocess.Popen(
-            ['git', 'config', '--local', 'diff.gpg.textconv', 'gpg -d'],
-            shell=False
-        ).wait()
 
 if __name__ == '__main__':
     main()
