@@ -27,6 +27,7 @@ class PasswordStore(object):
     def __init__(
             self,
             path=os.path.join(os.getenv("HOME"), ".password-store"),
+            git_dir=None,
     ):
         self.path = path
 
@@ -36,9 +37,8 @@ class PasswordStore(object):
         else:
             raise Exception("could not find .gpg-id file")
 
-        self.uses_git = os.path.isdir(
-            os.path.join(self.path, '.git')
-        )
+        self.git_dir = git_dir or os.path.join(self.path, '.git')
+        self.uses_git = (self.git_dir is not None)
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store"""
@@ -161,3 +161,42 @@ class PasswordStore(object):
                 gpg_id_file.write(gpg_id)
 
         return PasswordStore(path)
+
+    def git_add_and_commit(self, path, message=None):
+
+        git_add = subprocess.Popen(
+            [
+                'git',
+                "--git-dir=%s" % self.git_dir,
+                "--work-tree=%s" % self.path,
+                'add',
+                path
+            ],
+            shell=False
+        )
+        git_add.wait()
+
+        if message:
+            git_commit = subprocess.Popen(
+                [
+                    'git',
+                    "--git-dir=%s" % self.git_dir,
+                    "--work-tree=%s" % self.path,
+                    'commit',
+                    '-m',
+                    message
+                ],
+                shell=False
+            )
+        else:
+            git_commit = subprocess.Popen(
+                [
+                    'git',
+                    "--git-dir=%s" % self.git_dir,
+                    "--work-tree=%s" % self.path,
+                    'commit'
+                ],
+                shell=False
+            )
+
+        git_commit.wait()

@@ -25,21 +25,6 @@ import shutil
 from pypass.passwordstore import PasswordStore
 
 
-def git_add_and_commit(path, message=None):
-
-    git_add = subprocess.Popen(['git', 'add', path], shell=False)
-    git_add.wait()
-
-    if message:
-        git_commit = subprocess.Popen(
-            ['git', 'commit', '-m', message], shell=False
-        )
-    else:
-        git_commit = subprocess.Popen(['git', 'commit'], shell=False)
-
-    git_commit.wait()
-
-
 @click.group(invoke_without_command=True)
 @click.option('--PASSWORD_STORE_DIR',
               envvar='PASSWORD_STORE_DIR',
@@ -103,7 +88,7 @@ def insert(config, path):
     config['password_store'].insert_password(path, password)
 
     if config['password_store'].uses_git:
-        git_add_and_commit(
+        config['password_store'].git_add_and_commit(
             path + '.gpg',
             message='Added %s to store' % path
         )
@@ -289,7 +274,7 @@ def git(config, commands):
     git_result.wait()
 
     if len(command_list) > 0 and command_list[0] == 'init':
-        git_add_and_commit(
+        config['password_store'].git_add_and_commit(
             '.',
             message="Add current contents of password store."
         )
@@ -301,7 +286,7 @@ def git(config, commands):
         ) as gitattributes:
             gitattributes.write('*.gpg diff=gpg\n')
 
-        git_add_and_commit(
+        config['password_store'].git_add_and_commit(
             '.gitattributes',
             message="Configure git repository for gpg file diff."
         )
