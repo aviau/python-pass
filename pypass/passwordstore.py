@@ -38,7 +38,7 @@ class PasswordStore(object):
             raise Exception("could not find .gpg-id file")
 
         self.git_dir = git_dir or os.path.join(self.path, '.git')
-        self.uses_git = (self.git_dir is not None)
+        self.uses_git = os.path.isdir(self.git_dir)
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store"""
