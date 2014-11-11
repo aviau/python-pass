@@ -20,6 +20,20 @@
 import os
 import subprocess
 
+# Find the right gpg binary
+if subprocess.call(
+        ['which', 'gpg2'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE) == 0:
+    GPG_BIN = 'gpg2'
+elif subprocess.call(
+        ['which', 'gpg'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE) == 0:
+    GPG_BIN = 'gpg'
+else:
+    raise Exception("Could not find GPG")
+
 
 class PasswordStore(object):
     """This is a Password Store"""
@@ -64,7 +78,7 @@ class PasswordStore(object):
 
         gpg = subprocess.Popen(
             [
-                'gpg2',
+                GPG_BIN,
                 '--quiet',
                 '--batch',
                 '--use-agent',
@@ -87,7 +101,7 @@ class PasswordStore(object):
 
         gpg = subprocess.Popen(
             [
-                'gpg2',
+                GPG_BIN,
                 '-e',
                 '-r', self.gpg_id,
                 '--batch',
