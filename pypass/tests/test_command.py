@@ -250,7 +250,14 @@ class TestCommand(unittest.TestCase):
 
         # git init should set diff.gpg.binary to True
         diff_gpg_binary = subprocess.Popen(
-            ['git', 'config', '--local', 'diff.gpg.binary'],
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(self.dir, '.git'),
+                '--work-tree=%s' % self.dir,
+                'config',
+                '--local',
+                'diff.gpg.binary'
+            ],
             shell=False,
             stdout=subprocess.PIPE
         )
@@ -259,7 +266,14 @@ class TestCommand(unittest.TestCase):
 
         # git init should set diff.gpg.textconv to 'gpg -d'
         gpg = subprocess.Popen(
-            ['git', 'config', '--local', 'diff.gpg.textconv'],
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(self.dir, '.git'),
+                '--work-tree=%s' % self.dir,
+                'config',
+                '--local',
+                'diff.gpg.textconv'
+            ],
             shell=False,
             stdout=subprocess.PIPE
         )
@@ -269,11 +283,12 @@ class TestCommand(unittest.TestCase):
     def test_init_clone(self):
         # Setup origin repo
         origin_dir = tempfile.mkdtemp()
+        origin_git_dir = os.path.join(origin_dir, '.git')
 
         subprocess.Popen(
             [
                 'git',
-                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--git-dir=%s' % origin_git_dir,
                 '--work-tree=%s' % origin_dir,
                 'init',
                 origin_dir
@@ -283,24 +298,24 @@ class TestCommand(unittest.TestCase):
 
         open(os.path.join(origin_dir, 'test_git_init_clone.gpg'), 'a').close()
 
-        subprocess.Popen(
+        subprocess.call(
             [
                 'git',
-                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--git-dir=%s' % origin_git_dir,
                 '--work-tree=%s' % origin_dir,
                 'add', 'test_git_init_clone.gpg',
             ]
-        ).wait()
+        )
 
-        subprocess.Popen(
+        subprocess.call(
             [
                 'git',
-                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
+                '--git-dir=%s' % origin_git_dir,
                 '--work-tree=%s' % origin_dir,
                 'commit',
                 '-m', '"testcommit"',
             ]
-        ).wait()
+        )
 
         # Init
         self.run_cli(

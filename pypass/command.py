@@ -45,15 +45,6 @@ def main(ctx, password_store_dir, password_store_git):
         'password_store': PasswordStore(path=password_store_dir)
     }
 
-    # Setup git env vars
-    os.environ['GIT_WORK_TREE'] = config['password_store'].path
-
-    if password_store_git:
-        os.environ['GIT_DIR'] = password_store_git
-    else:
-        os.environ['GIT_DIR'] = \
-            os.path.join(config['password_store'].path, '.git')
-
     ctx.obj = config
 
     # By default, invoke ls
@@ -274,7 +265,11 @@ def git(config, commands):
         config['password_store'].git_init()
     else:
         git_result = subprocess.Popen(
-            ['git'] + command_list,
+            [
+                'git',
+                '--git-dir=%s' % config['password_store'].git_dir,
+                '--work-tree=%s' % config['password_store'].git_dir,
+            ] + command_list,
             shell=False,
         )
         git_result.wait()
