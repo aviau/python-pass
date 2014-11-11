@@ -126,14 +126,17 @@ class TestCommand(unittest.TestCase):
             dummy_file.write('test.com')
 
         self.assertTrue(os.path.isfile(dummy_file_path))
-        self.run_cli(['rm', 'test.com'])
+        rm_result = self.run_cli(['rm', 'test.com'], input='y\n')
         self.assertFalse(os.path.isfile(dummy_file_path))
+        self.assertIsNotNone(
+            re.match("Really remove .*test.com.gpg?", rm_result.output)
+        )
 
     def test_rm_dont_exist(self):
         result = self.run_cli(['rm', 'test.com'])
         self.assertEqual(
             result.output,
-            'Error: test.com is not in the password store\n'
+            'Error: test.com is not in the password store.\n'
         )
 
     def test_rm_recursive(self):
@@ -146,9 +149,12 @@ class TestCommand(unittest.TestCase):
         open(os.path.join(folder_path, 'passwordstore.org.gpg'), 'a').close()
         open(os.path.join(folder_path, 'test.com.gpg'), 'a').close()
 
-        self.run_cli(['rm', '-r', 'test_folder'])
+        rm_result = self.run_cli(['rm', '-r', 'test_folder'], input='y\n')
 
         self.assertFalse(os.path.isdir(folder_path))
+        self.assertIsNotNone(
+            re.match("Recursively remove .*test_folder?", rm_result.output)
+        )
 
     def test_mv_file(self):
         old_file_path = os.path.join(self.dir, 'move_me.gpg')

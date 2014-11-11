@@ -184,11 +184,14 @@ def rm(config, recursive, path):
 
     if os.path.exists(resolved_path):
         if recursive:
+            click.confirm("Recursively remove %s?" % resolved_path, abort=True)
             shutil.rmtree(resolved_path)
         else:
+            click.confirm("Really remove %s?" % resolved_path, abort=True)
             os.remove(resolved_path)
+        click.echo("%s was removed from the store." % path)
     else:
-        click.echo("Error: %s is not in the password store" % path)
+        click.echo("Error: %s is not in the password store." % path)
 
 
 @main.command()

@@ -88,7 +88,7 @@ Project Status
 - [X] ``pypass rm test.com`` removes the test.com.gpg file
 - [ ] ``pypass remove`` and ``pypass delete`` aliases
 - [X] ``pypass rm -r folder`` (or ``--recursive``)  will remove a folder and all of it's content (not interactive!)
-- [ ] Ask for confirmation
+- [X] Ask for confirmation
 
 ``pypass find``
 ---------------
@@ -100,11 +100,13 @@ Project Status
 -------------
 
 - [X] ``pypass cp old-path new-pah`` copies a password to a new path
+- [ ] Dont overwrite
 
 ``pypass mv``
 -------------
 
 - [X] ``pypass mv old-path new-path`` moves a password to a new path
+- [ ] Dont overwrite
 
 ``pypass git``
 --------------
