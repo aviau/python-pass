@@ -63,8 +63,8 @@ Project Status
 -----------------
 
 - [X] ``pypass insert test.com`` prompts for a password and creates a test.com.gpg file
-- [ ] multi-line support
-- [ ] create a git commit
+- [X] multi-line support
+- [X] create a git commit
 
 ``pypass show``
 ---------------

@@ -21,6 +21,7 @@ import click
 import os
 import subprocess
 import shutil
+import tempfile
 
 from pypass.passwordstore import PasswordStore
 
@@ -32,9 +33,14 @@ from pypass.passwordstore import PasswordStore
               type=click.Path(file_okay=False, resolve_path=True))
 @click.option('--PASSWORD_STORE_GIT',
               envvar='PASSWORD_STORE_GIT',
+              type=click.Path(file_okay=False, resolve_path=True),
+              default=None)
+@click.option('--EDITOR',
+              envvar='EDITOR',
+              default='editor',
               type=click.STRING)
 @click.pass_context
-def main(ctx, password_store_dir, password_store_git):
+def main(ctx, password_store_dir, password_store_git, editor):
 
     # init does not need any of this.
     if ctx.invoked_subcommand == "init":
@@ -42,7 +48,11 @@ def main(ctx, password_store_dir, password_store_git):
 
     # Prepare the config file
     config = {
-        'password_store': PasswordStore(path=password_store_dir)
+        'password_store': PasswordStore(
+            path=password_store_dir,
+            git_dir=password_store_git
+        ),
+        'editor': editor
     }
 
     ctx.obj = config
@@ -67,14 +77,21 @@ def init(path, clone, gpg_id):
 
 
 @main.command()
+@click.option('--multiline', '-m', is_flag=True)
 @click.argument('path', type=click.STRING)
 @click.pass_obj
-def insert(config, path):
-    password = click.prompt(
-        'Enter the password',
-        type=str,
-        confirmation_prompt=True
-    )
+def insert(config, path, multiline):
+
+    if multiline:
+        with tempfile.NamedTemporaryFile() as temp_file:
+            if subprocess.call([config['editor'], temp_file.name]) == 0:
+                password = temp_file.read().strip()
+    else:
+        password = click.prompt(
+            'Enter the password',
+            type=str,
+            confirmation_prompt=True
+        )
 
     config['password_store'].insert_password(path, password)
 
