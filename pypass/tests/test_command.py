@@ -72,7 +72,7 @@ class TestCommand(unittest.TestCase):
                 os.path.join(init_dir, '.password-store', '.gpg-id'),
                 'r'
             ).read(),
-            '5C5833E3'
+            '5C5833E3\n'
         )
 
         self.assertEqual(
