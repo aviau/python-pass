@@ -264,15 +264,14 @@ def git(config, commands):
     if len(command_list) > 0 and command_list[0] == 'init':
         config['password_store'].git_init()
     else:
-        git_result = subprocess.Popen(
+        subprocess.call(
             [
                 'git',
                 '--git-dir=%s' % config['password_store'].git_dir,
-                '--work-tree=%s' % config['password_store'].git_dir,
+                '--work-tree=%s' % config['password_store'].path,
             ] + command_list,
             shell=False,
         )
-        git_result.wait()
 
 
 if __name__ == '__main__':
