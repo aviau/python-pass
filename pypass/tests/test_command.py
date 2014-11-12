@@ -101,6 +101,15 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(show_result.output, 'super_secret\n')
 
+    def test_edit_not_exist(self):
+        edit_result = self.run_cli(
+            ['edit', 'woijewoifj.ccc']
+        )
+        self.assertEqual(
+            edit_result.output,
+            'woijewoifj.ccc is not in the password store.\n'
+        )
+
     def test_ls(self):
         # Create three dummy files
         open(os.path.join(self.dir, 'linux.ca.gpg'), 'a').close()
