@@ -114,3 +114,8 @@ Project Status
 - [X] Pass commands to git
 - [X] ``pypass git init`` should behave differently with an existing password store
 - [X] Add tests
+
+``pypass edit``
+--------------
+
+- [X] ``pypass edit test.com`` will open a text editor and let you edit the password

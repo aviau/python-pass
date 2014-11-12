@@ -103,6 +103,27 @@ def insert(config, path, multiline):
 
 
 @main.command()
+@click.pass_obj
+@click.argument('path', type=click.STRING)
+def edit(config, path):
+    if path in config['password_store'].get_passwords_list():
+        old_password = config['password_store'].get_decypted_password(path)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(old_password)
+            temp_file.flush()
+
+            subprocess.call([config['editor'], temp_file.name])
+            temp_file.seek(0)
+
+            config['password_store'].insert_password(
+                path, temp_file.file.read()
+            )
+            click.echo("%s was updated." % path)
+    else:
+        click.echo("%s is not in the password store." % path)
+
+
+@main.command()
 @click.argument('path', type=click.STRING)
 @click.pass_obj
 def show(config, path):

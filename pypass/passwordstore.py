@@ -111,6 +111,7 @@ class PasswordStore(object):
                 '--batch',
                 '--use-agent',
                 '--no-tty',
+                '--yes',
                 '-o', passfile_path
             ],
             shell=False,
