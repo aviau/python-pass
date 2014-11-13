@@ -119,3 +119,8 @@ Project Status
 --------------
 
 - [X] ``pypass edit test.com`` will open a text editor and let you edit the password
+
+``pypass grep``
+---------------
+
+- [X] ``pypass grep searchstring`` will search for the given string inside all of the encrypted passwords
