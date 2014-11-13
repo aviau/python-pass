@@ -197,6 +197,29 @@ def find(config, search_terms):
 
 
 @main.command()
+@click.argument('search_string')
+@click.pass_obj
+def grep(config, search_string):
+    for password in config['password_store'].get_passwords_list():
+        decrypted_password = \
+            config['password_store'].get_decypted_password(password)
+
+        grep = subprocess.Popen(
+            ['grep', '-e', search_string],
+            stdout=subprocess.PIPE,
+            stdin=subprocess.PIPE
+        )
+
+        grep.stdin.write(decrypted_password)
+        grep.stdin.close()
+
+        grep_stdout = grep.stdout.read()
+        if grep_stdout.strip() != '':
+            click.echo(password + ":")
+            click.echo(grep_stdout.strip())
+
+
+@main.command()
 @click.option('--recursive', '-r', is_flag=True)
 @click.argument('path', type=click.STRING)
 @click.pass_obj
