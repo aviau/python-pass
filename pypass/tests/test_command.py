@@ -27,6 +27,7 @@ import unittest
 import click.testing
 
 import pypass.command
+from pypass.passwordstore import PasswordStore
 
 
 class TestCommand(unittest.TestCase):
@@ -247,6 +248,16 @@ class TestCommand(unittest.TestCase):
             "Search\sTerms:\spass,vv\s.*passwordstore.org\s.*vv.com"
 
         self.assertIsNotNone(re.search(expected_regex, find_result.output))
+
+    def test_grep(self):
+        store = PasswordStore(self.dir)
+        store.insert_password('grep_test.com', 'GREPME')
+
+        grep_result = self.run_cli(['grep', 'GREPME'])
+        self.assertEqual(
+            grep_result.output,
+            'grep_test.com:\nGREPME\n'
+        )
 
     def test_git_init(self):
         self.run_cli(['git', 'init'])

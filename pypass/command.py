@@ -18,6 +18,7 @@
 #
 
 import click
+import colorama
 import os
 import subprocess
 import shutil
@@ -210,13 +211,15 @@ def grep(config, search_string):
             stdin=subprocess.PIPE
         )
 
-        grep.stdin.write(decrypted_password)
+        grep.stdin.write(decrypted_password.encode())
         grep.stdin.close()
 
-        grep_stdout = grep.stdout.read()
+        grep_stdout = grep.stdout.read().decode().strip()
         if grep_stdout.strip() != '':
-            click.echo(password + ":")
-            click.echo(grep_stdout.strip())
+            click.echo(
+                colorama.Fore.BLUE + password + ":" + '\n' +
+                colorama.Fore.RESET + grep_stdout
+            )
 
 
 @main.command()
