@@ -124,3 +124,12 @@ Project Status
 ---------------
 
 - [X] ``pypass grep searchstring`` will search for the given string inside all of the encrypted passwords
+
+
+``pypass generate``
+-------------------
+- [ ] ``pypass generate [pass-name] [pass-length]`` Genrates a new password using of length pass-length and inserts it into pass-name.
+- [ ] ``--no-symbols, -n``
+- [ ] ``--clip, -c``
+- [ ] ``--in-place, -i``
+- [ ] ``--force, -f``
