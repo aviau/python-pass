@@ -102,6 +102,24 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(show_result.output, 'super_secret\n')
 
+    def test_show_clip(self):
+        store = PasswordStore(self.dir)
+        store.insert_password('clip_test', 'clipme999\nbutnotthisnewline\nfff')
+
+        show_result = self.run_cli(['show', '-c', 'clip_test'])
+
+        self.assertEqual(
+            show_result.output,
+            'Copied clip_test to clipboard.\n'
+        )
+
+        # Check if the password is in the clipoard
+        xclip = subprocess.Popen(
+            ['xclip', '-o', '-selection', 'clipboard'],
+            stdout=subprocess.PIPE)
+        xclip.wait()
+        self.assertEqual(xclip.stdout.read(), 'clipme999')
+
     def test_edit_not_exist(self):
         edit_result = self.run_cli(
             ['edit', 'woijewoifj.ccc']

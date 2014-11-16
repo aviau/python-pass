@@ -125,12 +125,26 @@ def edit(config, path):
 
 
 @main.command()
+@click.option('--clip', '-c', is_flag=True)
 @click.argument('path', type=click.STRING)
 @click.pass_obj
-def show(config, path):
-    click.echo(
-        config['password_store'].get_decypted_password(path).strip(),
-    )
+def show(config, path, clip):
+    decrypted_password = \
+        config['password_store'].get_decypted_password(path).strip()
+
+    if clip:
+        xclip = subprocess.Popen(
+            [
+                'xclip',
+                '-selection', 'clipboard'
+            ],
+            stdin=subprocess.PIPE
+        )
+        xclip.stdin.write(decrypted_password.split('\n')[0])
+        xclip.stdin.close()
+        click.echo('Copied %s to clipboard.' % path)
+    else:
+        click.echo(decrypted_password)
 
 
 @main.command()

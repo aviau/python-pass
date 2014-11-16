@@ -70,7 +70,7 @@ Project Status
 ---------------
 
 - [X] ``pypass show test.com`` will display the content of test.com.gpg
-- [ ] ``--clip, -c`` copies the first line to the clipboard
+- [X] ``--clip, -c`` copies the first line to the clipboard
 
 ``pypass ls``
 -------------
