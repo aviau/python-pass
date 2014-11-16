@@ -57,7 +57,7 @@ Project Status
 - [X] Support ``--path`` option
 - [ ] re-encryption functionality
 - [X] Should output: ``Password store initialized for [gpg-id].``
-- [X} ``--clone <url>`` allows to init from an existing repo
+- [X] ``--clone <url>`` allows to init from an existing repo
 
 ``pypass insert``
 -----------------
@@ -65,6 +65,7 @@ Project Status
 - [X] ``pypass insert test.com`` prompts for a password and creates a test.com.gpg file
 - [X] multi-line support
 - [X] create a git commit
+- [ ] When inserting in a folder with a .gpg-id file, insert should use the .gpg-id file's key
 
 ``pypass show``
 ---------------
@@ -119,3 +120,17 @@ Project Status
 --------------
 
 - [X] ``pypass edit test.com`` will open a text editor and let you edit the password
+
+``pypass grep``
+---------------
+
+- [X] ``pypass grep searchstring`` will search for the given string inside all of the encrypted passwords
+
+
+``pypass generate``
+-------------------
+- [ ] ``pypass generate [pass-name] [pass-length]`` Genrates a new password using of length pass-length and inserts it into pass-name.
+- [ ] ``--no-symbols, -n``
+- [ ] ``--clip, -c``
+- [ ] ``--in-place, -i``
+- [ ] ``--force, -f``

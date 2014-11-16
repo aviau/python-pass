@@ -36,7 +36,13 @@ else:
 
 
 class PasswordStore(object):
-    """This is a Password Store"""
+    """This is a Password Store
+
+    :param path: The path of the password-store. By default,
+                 '$home/.password-store'.
+    :param git_dir: The git directory of the password store. By default,
+                    it looks for a .git directory in the password store.
+    """
 
     def __init__(
             self,
@@ -59,7 +65,10 @@ class PasswordStore(object):
             self.git_dir = git_dir
 
     def get_passwords_list(self):
-        """Returns a list of the passwords in the store"""
+        """Returns a list of the passwords in the store
+
+        :returns: Example: ['Email/bob.net', 'example.com']
+        """
         passwords = []
 
         for root, dirnames, filenames in os.walk(self.path):
@@ -72,7 +81,11 @@ class PasswordStore(object):
         return passwords
 
     def get_decypted_password(self, path):
-        """Returns the content of the decrypted password file"""
+        """Returns the content of the decrypted password file
+
+        :param path: The path of the password to be decrypted. Example:
+                     'email.com'
+        """
         passfile_path = os.path.realpath(
             os.path.join(
                 self.path,
@@ -97,7 +110,11 @@ class PasswordStore(object):
             return gpg.stdout.read().decode()
 
     def insert_password(self, path, password):
-        """Encrypts the password to the given path"""
+        """Encrypts the password at the given path
+
+        :param path: Where to insert the password. Ex: 'passwordstore.org'
+        :param password: The password to insert, can be multi-line
+        """
 
         passfile_path = os.path.realpath(
             os.path.join(self.path, path + '.gpg')
@@ -124,7 +141,17 @@ class PasswordStore(object):
 
     @staticmethod
     def init(gpg_id, path, clone_url=None):
-        """Creates a password store to the given path"""
+        """Creates a password store to the given path
+
+        :param gpg_id: Default gpg key identification used for encryption and
+                       decryption. Example: '3CCC3A3A'
+        :param path: Where to create the password store. By default, this is
+                     $home/.password-store
+        :param clone_url: If specified, the clone_url parameter will be used
+                          to import a password store from a git repository.
+                          Example: ssh://myserver.net:/home/bob/.password-store
+        :returns: PasswordStore object
+        """
         git_dir = os.path.join(path, '.git')
         git_work_tree = path
 
@@ -182,7 +209,12 @@ class PasswordStore(object):
         return PasswordStore(path)
 
     def git_init(self, git_dir=None):
-        """Transform  the existing password store into a git repository"""
+        """Transform  the existing password store into a git repository
+
+        :param git_dir: Where to create the git directory. By default, it will
+                        be created at the root of the password store in a .git
+                        folder.
+        """
 
         self.git_dir = git_dir or os.path.join(self.path, '.git')
         self.uses_git = True
