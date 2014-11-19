@@ -27,6 +27,7 @@ import unittest
 import click.testing
 
 import pypass.command
+import pypass.tests
 from pypass.passwordstore import PasswordStore
 
 
@@ -102,6 +103,8 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(show_result.output, 'super_secret\n')
 
+    # Can't get xclip to work in Travis.
+    @pypass.tests.skipIfTravis
     def test_show_clip(self):
         store = PasswordStore(self.dir)
         store.insert_password('clip_test', 'clipme999\nbutnotthisnewline\nfff')

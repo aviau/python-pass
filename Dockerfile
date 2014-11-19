@@ -4,8 +4,10 @@ FROM debian:testing
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-RUN apt-get update
-RUN apt-get install -y vim git python-pip tree gnupg2 python3 pypy
+# Skip the same tests as Travis
+ENV TRAVIS true
+
+RUN apt-get update && apt-get install -y vim git python-pip tree xclip gnupg2 python3 pypy
 RUN pip install tox
 
 RUN git config --global user.email "you@example.com"

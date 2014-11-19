@@ -15,7 +15,7 @@ install:
     - gpg --import-ownertrust pypass/tests/test_ownertrust.txt
     - git config --global user.email "you@example.com"
     - git config --global user.name "Your Name"
-    - sudo apt-get install -y tree xclip
+    - sudo apt-get install -y tree
     - sudo pip install tox
     - sudo pip install coveralls
 script:
