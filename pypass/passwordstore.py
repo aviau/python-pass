@@ -150,7 +150,7 @@ class PasswordStore(object):
         :param length: Length of the password. Defaults to 15
         """
 
-        chars = string.letters
+        chars = string.ascii_letters
 
         if symbols:
             chars += string.punctuation

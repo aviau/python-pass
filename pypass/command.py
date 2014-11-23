@@ -117,7 +117,7 @@ def generate(pass_name, pass_length, no_symbols):
         length=pass_length
     )
 
-    print password
+    print (password)
 
 
 @main.command()
