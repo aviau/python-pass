@@ -19,6 +19,8 @@
 
 import os
 import subprocess
+import string
+import random
 
 # Find the right gpg binary
 if subprocess.call(
@@ -138,6 +140,26 @@ class PasswordStore(object):
         gpg.stdin.write(password.encode())
         gpg.stdin.close()
         gpg.wait()
+
+    @staticmethod
+    def generate_password(digits=True, symbols=True, length=15):
+        """Returns a random password
+
+        :param digits: Should the password have digits? Defaults to True
+        :param symbols: Should the password have symbols? Defaults to True
+        :param length: Length of the password. Defaults to 15
+        """
+
+        chars = string.letters
+
+        if symbols:
+            chars += string.punctuation
+
+        if digits:
+            chars += string.digits
+
+        password = ''.join(random.choice(chars) for i in range(length))
+        return password
 
     @staticmethod
     def init(gpg_id, path, clone_url=None):

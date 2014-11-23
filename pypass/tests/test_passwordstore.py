@@ -21,6 +21,7 @@ import unittest
 import os
 import shutil
 import subprocess
+import string
 import tempfile
 
 from pypass.passwordstore import PasswordStore
@@ -170,3 +171,15 @@ class TestPasswordStore(unittest.TestCase):
 
         shutil.rmtree(origin_dir)
         shutil.rmtree(destination_dir)
+
+    def test_generate_password(self):
+        only_letters = PasswordStore.generate_password(digits=False, symbols=False)
+        self.assertTrue(only_letters.isalpha())
+
+        alphanum = PasswordStore.generate_password(digits=True, symbols=False)
+        self.assertTrue(alphanum.isalnum())
+        for char in alphanum:
+            self.assertTrue(char not in string.punctuation)
+
+        length_100 = PasswordStore.generate_password(length=100)
+        self.assertEqual(len(length_100), 100)

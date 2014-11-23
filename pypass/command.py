@@ -17,12 +17,13 @@
 #    along with python-pass.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import click
-import colorama
 import os
 import subprocess
 import shutil
 import tempfile
+
+import click
+import colorama
 
 from pypass.passwordstore import PasswordStore
 
@@ -101,6 +102,22 @@ def insert(config, path, multiline):
             path + '.gpg',
             message='Added %s to store' % path
         )
+
+
+@main.command()
+@click.option('--no-symbols', '-n', is_flag=True, default=False)
+@click.argument('pass_name', type=click.STRING)
+@click.argument('pass_length', type=int)
+def generate(pass_name, pass_length, no_symbols):
+    symbols = not no_symbols
+
+    password = PasswordStore.generate_password(
+        digits=True,
+        symbols=symbols,
+        length=pass_length
+    )
+
+    print password
 
 
 @main.command()
