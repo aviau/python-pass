@@ -64,6 +64,12 @@ def main(ctx, password_store_dir, password_store_git, editor):
         ctx.invoke(ls)
 
 
+@main.command(name='help')
+@click.pass_context
+def hlp(contex):
+    click.echo(contex.parent.get_help())
+
+
 @main.command()
 @click.option('--path', '-p',
               type=click.Path(file_okay=False, resolve_path=True),
