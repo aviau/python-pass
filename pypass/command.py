@@ -92,7 +92,8 @@ def insert(config, path, multiline):
         password = click.prompt(
             'Enter the password',
             type=str,
-            confirmation_prompt=True
+            confirmation_prompt=True,
+            hide_input=True
         )
 
     config['password_store'].insert_password(path, password)
