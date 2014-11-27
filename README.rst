@@ -72,6 +72,18 @@ Project Status
 
 - [X] ``pypass show test.com`` will display the content of test.com.gpg
 - [X] ``--clip, -c`` copies the first line to the clipboard
+- [ ] ``--password``, and ``--username`` options.
+    Accepted format:
+    ::
+        <the_password>
+        login: <the_login>
+        url: <the_url> 
+
+
+``pypass connect`` (or ``ssh``)
+-------------------------------
+
+This new command should connect to a server using an encrypted rsa key. 
 
 ``pypass ls``
 -------------
