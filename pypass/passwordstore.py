@@ -21,6 +21,7 @@ import os
 import subprocess
 import string
 import random
+import re
 
 # Find the right gpg binary
 if subprocess.call(
@@ -82,11 +83,13 @@ class PasswordStore(object):
 
         return passwords
 
-    def get_decypted_password(self, path):
+    def get_decypted_password(self, path, only_usr=False, only_pwd=False):
         """Returns the content of the decrypted password file
 
         :param path: The path of the password to be decrypted. Example:
                      'email.com'
+        :param only_usr: Only retrieve the username.
+        :param only_pwd: Only retrieve the password.
         """
         passfile_path = os.path.realpath(
             os.path.join(
@@ -109,7 +112,20 @@ class PasswordStore(object):
         gpg.wait()
 
         if gpg.returncode == 0:
-            return gpg.stdout.read().decode()
+            decrypted_password = gpg.stdout.read().decode()
+
+            if only_usr:
+                usr = re.search('(?:username|user|login): (.+)', decrypted_password)
+                if usr:
+                    return usr.groups()[0]
+            elif only_pwd:
+                pw = re.search('(?:password|pass): (.+)', decrypted_password)
+                if pw:
+                    return pw.groups()[0]
+                else:  # If there is no match, password is the first line
+                    return decrypted_password.split('\n')[0]
+            else:
+                return decrypted_password
 
     def insert_password(self, path, password):
         """Encrypts the password at the given path
