@@ -115,7 +115,10 @@ class PasswordStore(object):
             decrypted_password = gpg.stdout.read().decode()
 
             if only_usr:
-                usr = re.search('(?:username|user|login): (.+)', decrypted_password)
+                usr = re.search(
+                    '(?:username|user|login): (.+)',
+                    decrypted_password
+                )
                 if usr:
                     return usr.groups()[0]
             elif only_pwd:
