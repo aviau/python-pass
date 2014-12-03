@@ -25,7 +25,7 @@ import tempfile
 import click
 import colorama
 
-from pypass.passwordstore import PasswordStore
+from pypass import PasswordStore
 
 
 @click.group(invoke_without_command=True)

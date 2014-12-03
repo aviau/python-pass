@@ -24,7 +24,7 @@ import subprocess
 import string
 import tempfile
 
-from pypass.passwordstore import PasswordStore
+from pypass import PasswordStore
 
 
 class TestPasswordStore(unittest.TestCase):

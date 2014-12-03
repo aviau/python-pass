@@ -1,6 +1,5 @@
 API
 ===
 
-.. autoclass:: pypass.passwordstore.PasswordStore
+.. autoclass:: pypass.PasswordStore
     :members:
-
