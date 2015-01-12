@@ -23,6 +23,8 @@ import string
 import random
 import re
 
+from .entry_types import EntryTypes
+
 # Find the right gpg binary
 if subprocess.call(
         ['which', 'gpg2'],
@@ -83,13 +85,12 @@ class PasswordStore(object):
 
         return passwords
 
-    def get_decypted_password(self, path, only_usr=False, only_pwd=False):
+    def get_decypted_password(self, path, entry=None):
         """Returns the content of the decrypted password file
 
         :param path: The path of the password to be decrypted. Example:
                      'email.com'
-        :param only_usr: Only retrieve the username.
-        :param only_pwd: Only retrieve the password.
+        :param entry: The entry to retreive. (EntryType enum)
         """
         passfile_path = os.path.realpath(
             os.path.join(
@@ -114,14 +115,14 @@ class PasswordStore(object):
         if gpg.returncode == 0:
             decrypted_password = gpg.stdout.read().decode()
 
-            if only_usr:
+            if entry == EntryTypes.username:
                 usr = re.search(
                     '(?:username|user|login): (.+)',
                     decrypted_password
                 )
                 if usr:
                     return usr.groups()[0]
-            elif only_pwd:
+            elif entry == EntryTypes.password:
                 pw = re.search('(?:password|pass): (.+)', decrypted_password)
                 if pw:
                     return pw.groups()[0]

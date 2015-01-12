@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 #    Copyright (C) 2014 Alexandre Viau <alexandre@alexandreviau.net>
 #
@@ -18,10 +17,10 @@
 #    along with python-pass.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from .passwordstore import PasswordStore
-from .entry_types import EntryTypes
+from enum import Enum
 
-__all__ = [
-    'PasswordStore',
-    'EntryTypes'
-]
+
+class EntryTypes(Enum):
+    password = 1
+    username = 2
+    hostname = 3

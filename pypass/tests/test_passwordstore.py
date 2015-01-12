@@ -25,6 +25,7 @@ import string
 import tempfile
 
 from pypass import PasswordStore
+from pypass import EntryTypes
 
 
 class TestPasswordStore(unittest.TestCase):
@@ -85,7 +86,7 @@ class TestPasswordStore(unittest.TestCase):
             store.get_decypted_password('hello.com')
         )
 
-    def test_get_decrypted_password_only_user(self):
+    def test_get_decypted_password_specific_entry(self):
         store = PasswordStore(self.dir)
         password = 'ELLO'
         store.insert_password('hello.com', password)
@@ -94,19 +95,19 @@ class TestPasswordStore(unittest.TestCase):
         # the first line.
         self.assertEqual(
             'ELLO',
-            store.get_decypted_password('hello.com', only_pwd=True)
+            store.get_decypted_password('hello.com', entry=EntryTypes.password)
         )
 
         store.insert_password('hello.com', 'sdfsdf\npassword: pwd')
         self.assertEqual(
             'pwd',
-            store.get_decypted_password('hello.com', only_pwd=True)
+            store.get_decypted_password('hello.com', entry=EntryTypes.password)
         )
 
         store.insert_password('hello.com', 'sdf\npassword: pwd\nusername: bob')
         self.assertEqual(
             'bob',
-            store.get_decypted_password('hello.com', only_usr=True)
+            store.get_decypted_password('hello.com', entry=EntryTypes.username)
         )
 
     def test_get_decrypted_password_only_password(self):
