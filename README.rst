@@ -50,6 +50,12 @@ You can build the documentation and the man page yourself with ``tox -edocs``. T
 Project Status
 ++++++++++++++
 
+Bash completion
+---------------
+
+Comming soon.
+
+
 ``pypass init``
 ---------------
 
