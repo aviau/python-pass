@@ -4,7 +4,7 @@
 # Brian Mattern <rephorm@rephorm.com>. All Rights Reserved.
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
-_pass_complete_entries () {
+_pypass_complete_entries () {
 	prefix="${PASSWORD_STORE_DIR:-$HOME/.password-store/}"
 	suffix=".gpg"
 	autoexpand=${1:-0}
@@ -40,7 +40,7 @@ _pass_complete_entries () {
 	done
 }
 
-_pass_complete_folders () {
+_pypass_complete_folders () {
 	prefix="${PASSWORD_STORE_DIR:-$HOME/.password-store/}"
 
 	local IFS=$'\n'
@@ -51,51 +51,52 @@ _pass_complete_folders () {
 	done
 }
 
-_pass_complete_keys () {
+_pypass_complete_keys () {
 	local IFS=$'\n'
 	# Extract names and email addresses from gpg --list-keys
 	local keys="$(gpg2 --list-secret-keys --with-colons | cut -d : -f 10 | sort -u | sed '/^$/d')"
 	COMPREPLY+=($(compgen -W "${keys}" -- ${cur}))
 }
 
-_pass()
+_pypass()
 {
 	COMPREPLY=()
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	local commands="init ls find grep show insert generate edit rm mv cp git help version"
 	if [[ $COMP_CWORD -gt 1 ]]; then
 		local lastarg="${COMP_WORDS[$COMP_CWORD-1]}"
+		COMPREPLY+=($(compgen -W "-h --help" -- ${cur}))
 		case "${COMP_WORDS[1]}" in
 			init)
 				if [[ $lastarg == "-p" || $lastarg == "--path" ]]; then
-					_pass_complete_folders
+					_pypass_complete_folders
 				else
 					COMPREPLY+=($(compgen -W "-p --path" -- ${cur}))
-					_pass_complete_keys
+					_pypass_complete_keys
 				fi
 				;;
 			ls|list|edit)
-				_pass_complete_entries
+				_pypass_complete_entries
 				;;
 			show|-*)
 				COMPREPLY+=($(compgen -W "-c --clip" -- ${cur}))
-				_pass_complete_entries 1
+				_pypass_complete_entries 1
 				;;
 			insert)
-				COMPREPLY+=($(compgen -W "-e --echo -m --multiline -f --force" -- ${cur}))
-				_pass_complete_entries
+				COMPREPLY+=($(compgen -W "-m --multiline" -- ${cur}))
+				_pypass_complete_entries
 				;;
 			generate)
-				COMPREPLY+=($(compgen -W "-n --no-symbols -c --clip -f --force -i --in-place" -- ${cur}))
-				_pass_complete_entries
+				COMPREPLY+=($(compgen -W "-n --no-symbols" -- ${cur}))
+				_pypass_complete_entries
 				;;
-			cp|copy|mv|rename)
-				COMPREPLY+=($(compgen -W "-f --force" -- ${cur}))
-				_pass_complete_entries
+			cp|mv)
+				#COMPREPLY+=($(compgen -W "-f --force" -- ${cur}))
+				_pypass_complete_entries
 				;;
-			rm|remove|delete)
-				COMPREPLY+=($(compgen -W "-r --recursive -f --force" -- ${cur}))
-				_pass_complete_entries
+			rm)
+				COMPREPLY+=($(compgen -W "-r --recursive" -- ${cur}))
+				_pypass_complete_entries
 				;;
 			git)
 				COMPREPLY+=($(compgen -W "init push pull config log reflog rebase" -- ${cur}))
@@ -103,8 +104,8 @@ _pass()
 		esac
 	else
 		COMPREPLY+=($(compgen -W "${commands}" -- ${cur}))
-		_pass_complete_entries 1
+		#_pypass_complete_entries 1
 	fi
 }
 
-complete -o filenames -o nospace -F _pass pass
+complete -o filenames -o nospace -F _pypass pypass
