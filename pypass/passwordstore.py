@@ -23,7 +23,7 @@ import string
 import random
 import re
 
-from .entry_types import EntryTypes
+from .entry_type import EntryType
 
 # Find the right gpg binary
 if subprocess.call(
@@ -115,14 +115,14 @@ class PasswordStore(object):
         if gpg.returncode == 0:
             decrypted_password = gpg.stdout.read().decode()
 
-            if entry == EntryTypes.username:
+            if entry == EntryType.username:
                 usr = re.search(
                     '(?:username|user|login): (.+)',
                     decrypted_password
                 )
                 if usr:
                     return usr.groups()[0]
-            elif entry == EntryTypes.password:
+            elif entry == EntryType.password:
                 pw = re.search('(?:password|pass): (.+)', decrypted_password)
                 if pw:
                     return pw.groups()[0]

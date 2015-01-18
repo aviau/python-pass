@@ -19,9 +19,9 @@
 #
 
 from .passwordstore import PasswordStore
-from .entry_types import EntryTypes
+from .entry_type import EntryType
 
 __all__ = [
     'PasswordStore',
-    'EntryTypes'
+    'EntryType'
 ]
