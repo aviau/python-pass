@@ -8,7 +8,7 @@ python-pass
   :target: https://coveralls.io/r/ReAzem/python-pass?branch=master
 
 .. image:: https://readthedocs.org/projects/pypass/badge/?version=latest&style
-    :target: http://pypass.readthedocs.org
+    :target: https://readthedocs.org/projects/pypass/
     :alt: Documentation Status
 
 
