@@ -24,7 +24,9 @@ import tempfile
 
 import click
 import colorama
+import pxssh
 
+from pypass.entry_type import EntryType
 from pypass import PasswordStore
 
 
@@ -169,6 +171,21 @@ def show(config, path, clip):
         click.echo('Copied %s to clipboard.' % path)
     else:
         click.echo(decrypted_password)
+
+
+@main.command()
+@click.argument('path', type=click.STRING)
+@click.pass_obj
+def connect(config, path):
+    store = config['password_store']
+    hostname = store.get_decypted_password(path, entry=EntryType.hostname)
+    username = store.get_decypted_password(path, entry=EntryType.username)
+    password = store.get_decypted_password(path, entry=EntryType.password)
+    s = pxssh.pxssh()
+    click.echo("Connectig to %s" % hostname)
+    s.login(hostname, username, password=password)
+    s.sendline()
+    s.interact()
 
 
 @main.command()
