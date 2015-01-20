@@ -128,6 +128,9 @@ class PasswordStore(object):
                     return pw.groups()[0]
                 else:  # If there is no match, password is the first line
                     return decrypted_password.split('\n')[0]
+            elif entry == EntryType.hostname:
+                hostname = re.search('(?:host|hostname): (.+)', decrypted_password)
+                return hostname.groups()[0]
             else:
                 return decrypted_password
 
