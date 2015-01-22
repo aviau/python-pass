@@ -62,7 +62,7 @@ _pypass()
 {
 	COMPREPLY=()
 	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local commands="init ls find grep show insert generate edit rm mv cp git help version"
+	local commands="init ls find grep show insert generate edit rm mv cp connect git help version"
 	if [[ $COMP_CWORD -gt 1 ]]; then
 		local lastarg="${COMP_WORDS[$COMP_CWORD-1]}"
 		COMPREPLY+=($(compgen -W "-h --help" -- ${cur}))
@@ -75,7 +75,7 @@ _pypass()
 					_pypass_complete_keys
 				fi
 				;;
-			ls|list|edit)
+			ls|list|edit|connect)
 				_pypass_complete_entries
 				;;
 			show|-*)
