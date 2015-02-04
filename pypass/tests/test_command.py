@@ -103,6 +103,15 @@ class TestCommand(unittest.TestCase):
 
         self.assertEqual(show_result.output, 'super_secret\n')
 
+    def test_show_non_existing_password(self):
+        # Show the password for test.com
+        show_result = self.run_cli(
+            ['show', 'test.com'],
+        )
+
+        self.assertEqual(show_result.output,
+                         'Error: test.com is not in the password store.\n')
+
     # Can't get xclip to work in Travis.
     @pypass.tests.skipIfTravis
     def test_show_clip(self):

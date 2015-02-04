@@ -20,6 +20,7 @@
 import os
 import subprocess
 import shutil
+import sys
 import tempfile
 
 import click
@@ -155,6 +156,10 @@ def edit(config, path):
 @click.argument('path', type=click.STRING)
 @click.pass_obj
 def show(config, path, clip):
+    if path not in config['password_store'].get_passwords_list():
+        click.echo('Error: %s is not in the password store.' % path)
+        sys.exit()
+
     decrypted_password = \
         config['password_store'].get_decypted_password(path).strip()
 
