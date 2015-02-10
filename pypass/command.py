@@ -147,6 +147,13 @@ def edit(config, path):
                 path, temp_file.file.read()
             )
             click.echo("%s was updated." % path)
+
+            if config['password_store'].uses_git:
+                config['password_store'].git_add_and_commit(
+                    path + '.gpg',
+                    message='Edited password for %s using %s'
+                            % (path, config['editor'])
+                )
     else:
         click.echo("%s is not in the password store." % path)
 
