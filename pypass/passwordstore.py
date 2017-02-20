@@ -132,7 +132,8 @@ class PasswordStore(object):
                 hostname = re.search(
                     '(?:host|hostname): (.+)', decrypted_password
                 )
-                return hostname.groups()[0]
+                if hostname:
+                    return hostname.groups()[0]
             else:
                 return decrypted_password
 
