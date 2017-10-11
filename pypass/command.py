@@ -135,7 +135,7 @@ def generate(pass_name, pass_length, no_symbols):
 @click.argument('path', type=click.STRING)
 def edit(config, path):
     if path in config['password_store'].get_passwords_list():
-        old_password = config['password_store'].get_decypted_password(path)
+        old_password = config['password_store'].get_decrypted_password(path)
         with tempfile.NamedTemporaryFile() as temp_file:
             temp_file.write(old_password)
             temp_file.flush()
@@ -168,7 +168,7 @@ def show(config, path, clip):
         sys.exit()
 
     decrypted_password = \
-        config['password_store'].get_decypted_password(path).strip()
+        config['password_store'].get_decrypted_password(path).strip()
 
     if clip:
         xclip = subprocess.Popen(
@@ -190,9 +190,9 @@ def show(config, path, clip):
 @click.pass_obj
 def connect(config, path):
     store = config['password_store']
-    hostname = store.get_decypted_password(path, entry=EntryType.hostname)
-    username = store.get_decypted_password(path, entry=EntryType.username)
-    password = store.get_decypted_password(path, entry=EntryType.password)
+    hostname = store.get_decrypted_password(path, entry=EntryType.hostname)
+    username = store.get_decrypted_password(path, entry=EntryType.username)
+    password = store.get_decrypted_password(path, entry=EntryType.password)
     s = pxssh.pxssh()
     click.echo("Connectig to %s" % hostname)
     s.login(hostname, username, password=password)
@@ -270,7 +270,7 @@ def find(config, search_terms):
 def grep(config, search_string):
     for password in config['password_store'].get_passwords_list():
         decrypted_password = \
-            config['password_store'].get_decypted_password(password)
+            config['password_store'].get_decrypted_password(password)
 
         grep = subprocess.Popen(
             ['grep', '-e', search_string],
