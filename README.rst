@@ -29,8 +29,7 @@ On your machine
 ---------------
 
 - Install the requirements: ``sudo apt-get install -y gnupg tree``
-- Import the testing GPG key: ``gpg --allow-secret-key-import --import pypass/tests/test_key_sec.asc``
-- Trust the key: ``gpg --import-ownertrust pypass/tests/test_ownertrust.txt``
+- Prepare the gnupg home directory for testing: ``./pypass/tests/setup_gpg.sh``
 - Run the tests: ``tox``
 
 
