@@ -114,6 +114,24 @@ class TestPasswordStore(unittest.TestCase):
         store = PasswordStore(self.dir)
         password = 'ELLO'
         store.insert_password('hello.com', password)
+        self.assertEqual(
+            'ELLO',
+            store.get_decrypted_password('hello.com')
+        )
+
+    def test_get_decrypted_password_deeply_nested(self):
+        store = PasswordStore(self.dir)
+        password = 'Alice'
+        store.insert_password('A/B/C/D/hello.com', password)
+        store.insert_password('A/B/C/hello.com', password)
+        self.assertEqual(
+            'Alice',
+            store.get_decrypted_password('A/B/C/D/hello.com')
+        )
+        self.assertEqual(
+            'Alice',
+            store.get_decrypted_password('A/B/C/hello.com')
+        )
 
     def test_init(self):
         init_dir = tempfile.mkdtemp()

@@ -148,6 +148,9 @@ class PasswordStore(object):
             os.path.join(self.path, path + '.gpg')
         )
 
+        if not os.path.isdir(os.path.dirname(passfile_path)):
+            os.makedirs(os.path.dirname(passfile_path))
+
         gpg = subprocess.Popen(
             [
                 GPG_BIN,
