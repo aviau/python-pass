@@ -11,6 +11,7 @@ dist
 ChangeLog
 doc/build
 build
+pypass/tests/gnupg/
 
 # coverage
 .coverage*

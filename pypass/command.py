@@ -25,7 +25,7 @@ import tempfile
 
 import click
 import colorama
-import pxssh
+from pexpect import pxssh
 
 from pypass.entry_type import EntryType
 from pypass import PasswordStore
@@ -127,7 +127,7 @@ def generate(pass_name, pass_length, no_symbols):
         length=pass_length
     )
 
-    print (password)
+    print(password)
 
 
 @main.command()
@@ -165,7 +165,7 @@ def edit(config, path):
 def show(config, path, clip):
     if path not in config['password_store'].get_passwords_list():
         click.echo('Error: %s is not in the password store.' % path)
-        sys.exit()
+        sys.exit(1)
 
     decrypted_password = \
         config['password_store'].get_decypted_password(path).strip()
@@ -178,7 +178,7 @@ def show(config, path, clip):
             ],
             stdin=subprocess.PIPE
         )
-        xclip.stdin.write(decrypted_password.split('\n')[0])
+        xclip.stdin.write(decrypted_password.split('\n')[0].encode('utf8'))
         xclip.stdin.close()
         click.echo('Copied %s to clipboard.' % path)
     else:

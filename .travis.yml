@@ -1,18 +1,17 @@
 language: python
 env:
     - TOX_ENV=py27
-    - TOX_ENV=py32
-    - TOX_ENV=py33
+    # - TOX_ENV=py32
+    # - TOX_ENV=py33
     - TOX_ENV=py34
-    - TOX_ENV=pypy
-    - TOX_ENV=pypy3
+    # - TOX_ENV=pypy
+    # - TOX_ENV=pypy3
     - TOX_ENV=flake8
     - TOX_ENV=docs
     - TOX_ENV=coverage
 install:
     - sudo apt-get install -y gnupg2
-    - gpg --allow-secret-key-import --import  pypass/tests/test_key_sec.asc
-    - gpg --import-ownertrust pypass/tests/test_ownertrust.txt
+    - make setup_gpg
     - git config --global user.email "you@example.com"
     - git config --global user.name "Your Name"
     - sudo apt-get install -y tree

@@ -130,7 +130,7 @@ class TestCommand(unittest.TestCase):
             ['xclip', '-o', '-selection', 'clipboard'],
             stdout=subprocess.PIPE)
         xclip.wait()
-        self.assertEqual(xclip.stdout.read(), 'clipme999')
+        self.assertEqual(xclip.stdout.read().decode('utf8'), 'clipme999')
 
     def test_edit_not_exist(self):
         edit_result = self.run_cli(
