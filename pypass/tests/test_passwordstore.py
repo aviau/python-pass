@@ -83,10 +83,10 @@ class TestPasswordStore(unittest.TestCase):
 
         self.assertEqual(
             password,
-            store.get_decypted_password('hello.com')
+            store.get_decrypted_password('hello.com')
         )
 
-    def test_get_decypted_password_specific_entry(self):
+    def test_get_decrypted_password_specific_entry(self):
         store = PasswordStore(self.dir)
         password = 'ELLO'
         store.insert_password('hello.com', password)
@@ -95,19 +95,19 @@ class TestPasswordStore(unittest.TestCase):
         # the first line.
         self.assertEqual(
             'ELLO',
-            store.get_decypted_password('hello.com', entry=EntryType.password)
+            store.get_decrypted_password('hello.com', entry=EntryType.password)
         )
 
         store.insert_password('hello.com', 'sdfsdf\npassword: pwd')
         self.assertEqual(
             'pwd',
-            store.get_decypted_password('hello.com', entry=EntryType.password)
+            store.get_decrypted_password('hello.com', entry=EntryType.password)
         )
 
         store.insert_password('hello.com', 'sdf\npassword: pwd\nusername: bob')
         self.assertEqual(
             'bob',
-            store.get_decypted_password('hello.com', entry=EntryType.username)
+            store.get_decrypted_password('hello.com', entry=EntryType.username)
         )
 
     def test_get_decrypted_password_only_password(self):

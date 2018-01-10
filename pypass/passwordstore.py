@@ -85,7 +85,7 @@ class PasswordStore(object):
 
         return passwords
 
-    def get_decypted_password(self, path, entry=None):
+    def get_decrypted_password(self, path, entry=None):
         """Returns the content of the decrypted password file
 
         :param path: The path of the password to be decrypted. Example:
