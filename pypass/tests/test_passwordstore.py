@@ -121,16 +121,21 @@ class TestPasswordStore(unittest.TestCase):
 
     def test_get_decrypted_password_deeply_nested(self):
         store = PasswordStore(self.dir)
-        password = 'Alice'
-        store.insert_password('A/B/C/D/hello.com', password)
-        store.insert_password('A/B/C/hello.com', password)
+        self.assertFalse(
+            os.path.isdir(os.path.join(self.dir, 'A', 'B', 'C'))
+        )
+        store.insert_password('A/B/C/D/hello.com', 'Alice')
+        store.insert_password('A/B/C/hello.com', 'Bob')
         self.assertEqual(
             'Alice',
             store.get_decrypted_password('A/B/C/D/hello.com')
         )
         self.assertEqual(
-            'Alice',
+            'Bob',
             store.get_decrypted_password('A/B/C/hello.com')
+        )
+        self.assertTrue(
+            os.path.isdir(os.path.join(self.dir, 'A', 'B', 'C', 'D'))
         )
 
     def test_init(self):
