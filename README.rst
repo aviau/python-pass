@@ -12,7 +12,7 @@ python-pass
     :alt: Documentation Status
 
 
-.. image:: https://pypip.in/version/pypass/badge.svg
+.. image:: https://img.shields.io/pypi/v/pypass.svg
     :target: https://pypi.python.org/pypi/pypass/
     :alt: Latest Version
 
