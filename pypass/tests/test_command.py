@@ -150,7 +150,7 @@ class TestCommand(unittest.TestCase):
         ls_result = self.run_cli(['ls'])
 
         expected_regex = \
-            "Password Store\s.*linux.ca\s.*passwordstore.org\s.*test.com"
+            r'Password Store\s.*linux.ca\s.*passwordstore.org\s.*test.com'
 
         self.assertIsNotNone(re.search(expected_regex, ls_result.output))
 
@@ -275,7 +275,7 @@ class TestCommand(unittest.TestCase):
         find_result = self.run_cli(['find', 'pass', 'vv'])
 
         expected_regex = \
-            "Search\sTerms:\spass,vv\s.*passwordstore.org\s.*vv.com"
+            r'Search\sTerms:\spass,vv\s.*passwordstore.org\s.*vv.com'
 
         self.assertIsNotNone(re.search(expected_regex, find_result.output))
 
