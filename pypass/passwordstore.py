@@ -57,9 +57,10 @@ class PasswordStore(object):
         self.path = path
 
         # Read the .gpg-id
-        gpg_id_file = os.path.join(path, '.gpg-id')
-        if os.path.isfile(gpg_id_file):
-            self.gpg_id = open(gpg_id_file, 'r').read().strip()
+        gpg_id_path = os.path.join(path, '.gpg-id')
+        if os.path.isfile(gpg_id_path):
+            with open(gpg_id_path, 'r') as gpg_id_file:
+                self.gpg_id = gpg_id_file.read().strip()
         else:
             raise Exception("could not find .gpg-id file")
 
@@ -254,7 +255,7 @@ class PasswordStore(object):
         gpg_id_path = os.path.join(path, '.gpg-id')
         if os.path.exists(gpg_id_path) is False:
             # Create .gpg_id and put the gpg id in it
-            with open(os.path.join(path, '.gpg-id'), 'a') as gpg_id_file:
+            with open(gpg_id_path, 'a') as gpg_id_file:
                 gpg_id_file.write(gpg_id + '\n')
 
         return PasswordStore(path)

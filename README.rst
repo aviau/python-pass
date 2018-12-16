@@ -23,7 +23,7 @@ Python-pass will provide the same functionality as `pass <http://www.passwordsto
 Testing
 +++++++
 
-Python-pass is tested for python 2.7, 3.2, 3.3, 3.4, pypy and pypy3
+Python-pass is tested for python 2.7, 3.6, 3.7, pypy and pypy3
 
 On your machine
 ---------------
@@ -82,13 +82,13 @@ Comming soon.
     ::
         <the_password>
         login: <the_login>
-        url: <the_url> 
+        url: <the_url>
 
 
 ``pypass connect`` (or ``ssh``)
 -------------------------------
 
-This new command should connect to a server using an encrypted rsa key. 
+This new command should connect to a server using an encrypted rsa key.
 
 ``pypass ls``
 -------------
