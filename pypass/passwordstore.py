@@ -20,10 +20,17 @@
 import os
 import subprocess
 import string
-import random
 import re
 
 from .entry_type import EntryType
+
+# Secure source of randomness for password generation
+try:
+    from secrets import choice
+except ImportError:
+    import random
+    _system_random = random.SystemRandom()
+    choice = _system_random.choice
 
 # Find the right gpg binary
 if subprocess.call(
@@ -188,7 +195,7 @@ class PasswordStore(object):
         if digits:
             chars += string.digits
 
-        password = ''.join(random.choice(chars) for i in range(length))
+        password = ''.join(choice(chars) for i in range(length))
         return password
 
     @staticmethod
