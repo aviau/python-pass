@@ -110,10 +110,17 @@ class TestPasswordStore(unittest.TestCase):
             store.get_decrypted_password('hello.com', entry=EntryType.password)
         )
 
-        store.insert_password('hello.com', 'sdf\npassword: pwd\nusername: bob')
+        store.insert_password(
+            'hello',
+            'sdf\npassword: pwd\nusername: bob\nhost: salut.fr'
+        )
         self.assertEqual(
             'bob',
-            store.get_decrypted_password('hello.com', entry=EntryType.username)
+            store.get_decrypted_password('hello', entry=EntryType.username)
+        )
+        self.assertEqual(
+            'salut.fr',
+            store.get_decrypted_password('hello', entry=EntryType.hostname)
         )
 
     def test_get_decrypted_password_only_password(self):
