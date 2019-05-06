@@ -330,6 +330,40 @@ class TestCommand(unittest.TestCase):
         gpg.wait()
         self.assertEqual(gpg.stdout.read().decode(), 'gpg -d\n')
 
+    def test_git_init_insert_and_show(self):
+        self.run_cli(['git', 'init'])
+
+        self.run_cli(
+            ['insert', 'test.com'],
+            input='super_secret\nsuper_secret'
+        )
+
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.dir, 'test.com.gpg'))
+        )
+
+        git_log = subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(self.dir, '.git'),
+                '--work-tree=%s' % self.dir,
+                'log', '-1', '--pretty=%B'
+            ],
+            shell=False,
+            stdout=subprocess.PIPE
+        )
+        git_log.wait()
+        self.assertEqual(
+            git_log.stdout.read().decode(),
+            'Added test.com to store\n\n'
+        )
+
+        show_result = self.run_cli(
+            ['show', 'test.com'],
+            input='super_secret\nsuper_secret'
+        )
+        self.assertEqual(show_result.output, 'super_secret\n')
+
     def test_init_clone(self):
         # Setup origin repo
         origin_dir = tempfile.mkdtemp()
