@@ -33,10 +33,16 @@ from pypass.passwordstore import PasswordStore
 
 class TestCommand(unittest.TestCase):
 
-    def run_cli(self, args, input=None):
+    def run_cli(self, args, input=None, expect_failure=False):
         args = ['--PASSWORD_STORE_DIR', self.dir] + list(args)
         runner = click.testing.CliRunner()
         result = runner.invoke(pypass.command.main, args, input=input)
+        if result.exit_code != 0 and not expect_failure:
+            if result.exception is not None:
+                raise result.exception
+            else:
+                raise Exception(
+                    'Invoking "pypass {}" failed'.format(' '.join(args)))
         return result
 
     def setUp(self):
@@ -107,6 +113,7 @@ class TestCommand(unittest.TestCase):
         # Show the password for test.com
         show_result = self.run_cli(
             ['show', 'test.com'],
+            expect_failure=True
         )
 
         self.assertEqual(show_result.output,
