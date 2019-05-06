@@ -139,6 +139,16 @@ class TestCommand(unittest.TestCase):
         xclip.wait()
         self.assertEqual(xclip.stdout.read().decode('utf8'), 'clipme999')
 
+    def test_edit(self):
+        store = PasswordStore(self.dir)
+        store.insert_password('test.com', 'editme')
+
+        mock_editor = os.path.join(os.path.dirname(__file__), 'mock_editor.py')
+        self.run_cli(['--EDITOR', mock_editor, 'edit', 'test.com'])
+
+        edited_content = store.get_decrypted_password('test.com')
+        self.assertEqual(edited_content, 'edited')
+
     def test_edit_not_exist(self):
         edit_result = self.run_cli(
             ['edit', 'woijewoifj.ccc']
