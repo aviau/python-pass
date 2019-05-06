@@ -424,3 +424,8 @@ class TestCommand(unittest.TestCase):
                 os.path.join(self.dir, '.gpg-id')
             )
         )
+
+    def test_generate_no_symbols(self):
+        generate = self.run_cli(['generate', '-n', 'test.com', '20'])
+        password = generate.output.strip()
+        self.assertIsNotNone(re.match('[a-zA-Z0-9]{20}$', password))
