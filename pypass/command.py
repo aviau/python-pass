@@ -129,6 +129,12 @@ def generate(config, pass_name, pass_length, no_symbols):
         length=pass_length
     )
 
+    if config['password_store'].uses_git:
+        config['password_store'].git_add_and_commit(
+            pass_name + '.gpg',
+            message='Added %s to store' % pass_name
+        )
+
     click.echo(password)
 
 

@@ -45,6 +45,20 @@ class TestCommand(unittest.TestCase):
                     'Invoking "pypass {}" failed'.format(' '.join(args)))
         return result
 
+    def assertLastCommitMessage(self, text):
+        git_log = subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(self.dir, '.git'),
+                '--work-tree=%s' % self.dir,
+                'log', '-1', '--pretty=%B'
+            ],
+            shell=False,
+            stdout=subprocess.PIPE
+        )
+        git_log.wait()
+        self.assertEqual(git_log.stdout.read().decode(), text + '\n\n')
+
     def setUp(self):
         self.dir = tempfile.mkdtemp()
 
@@ -355,25 +369,8 @@ class TestCommand(unittest.TestCase):
             input='super_secret\nsuper_secret'
         )
 
-        self.assertTrue(
-            os.path.isfile(os.path.join(self.dir, 'test.com.gpg'))
-        )
-
-        git_log = subprocess.Popen(
-            [
-                'git',
-                '--git-dir=%s' % os.path.join(self.dir, '.git'),
-                '--work-tree=%s' % self.dir,
-                'log', '-1', '--pretty=%B'
-            ],
-            shell=False,
-            stdout=subprocess.PIPE
-        )
-        git_log.wait()
-        self.assertEqual(
-            git_log.stdout.read().decode(),
-            'Added test.com to store\n\n'
-        )
+        self.assertTrue(os.path.isfile(os.path.join(self.dir, 'test.com.gpg')))
+        self.assertLastCommitMessage('Added test.com to store')
 
         show_result = self.run_cli(
             ['show', 'test.com'],
@@ -446,3 +443,12 @@ class TestCommand(unittest.TestCase):
         generate = self.run_cli(['generate', '-n', 'test.com', '20'])
         password = generate.output.strip()
         self.assertIsNotNone(re.match('[a-zA-Z0-9]{20}$', password))
+
+        store = PasswordStore(self.dir)
+        decoded = store.get_decrypted_password('test.com')
+        self.assertEqual(decoded, password)
+
+    def test_generate_in_repo(self):
+        self.run_cli(['git', 'init'])
+        self.run_cli(['generate', 'test.ca', '25'])
+        self.assertLastCommitMessage('Added test.ca to store')
