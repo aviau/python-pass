@@ -239,17 +239,18 @@ class TestPasswordStore(unittest.TestCase):
         shutil.rmtree(destination_dir)
 
     def test_generate_password(self):
-        only_letters = PasswordStore.generate_password(
-            digits=False,
-            symbols=False
-        )
+        store = PasswordStore(self.dir)
 
+        store.generate_password('letters.net', digits=False, symbols=False)
+        only_letters = store.get_decrypted_password('letters.net')
         self.assertTrue(only_letters.isalpha())
 
-        alphanum = PasswordStore.generate_password(digits=True, symbols=False)
+        store.generate_password('alphanum.co.uk', digits=True, symbols=False)
+        alphanum = store.get_decrypted_password('alphanum.co.uk')
         self.assertTrue(alphanum.isalnum())
         for char in alphanum:
             self.assertTrue(char not in string.punctuation)
 
-        length_100 = PasswordStore.generate_password(length=100)
+        store.generate_password('hundred.org', length=100)
+        length_100 = store.get_decrypted_password('hundred.org')
         self.assertEqual(len(length_100), 100)

@@ -178,13 +178,14 @@ class PasswordStore(object):
         gpg.stdin.close()
         gpg.wait()
 
-    @staticmethod
-    def generate_password(digits=True, symbols=True, length=15):
+    def generate_password(self, path, digits=True, symbols=True, length=15):
         """Returns a random password
 
+        :param path: Where to insert the password. Ex: 'passwordstore.org'
         :param digits: Should the password have digits? Defaults to True
         :param symbols: Should the password have symbols? Defaults to True
         :param length: Length of the password. Defaults to 15
+        :returns: Generated password.
         """
 
         chars = string.ascii_letters
@@ -196,6 +197,9 @@ class PasswordStore(object):
             chars += string.digits
 
         password = ''.join(choice(chars) for i in range(length))
+
+        self.insert_password(path, password)
+
         return password
 
     @staticmethod

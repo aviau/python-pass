@@ -115,19 +115,21 @@ def insert(config, path, multiline):
 
 
 @main.command()
-@click.option('--no-symbols', '-n', is_flag=True, default=False)
+@click.option('--no-symbols', '-n', is_flag=True)
 @click.argument('pass_name', type=click.STRING)
 @click.argument('pass_length', type=int)
-def generate(pass_name, pass_length, no_symbols):
+@click.pass_obj
+def generate(config, pass_name, pass_length, no_symbols):
     symbols = not no_symbols
 
-    password = PasswordStore.generate_password(
+    password = config['password_store'].generate_password(
+        pass_name,
         digits=True,
         symbols=symbols,
         length=pass_length
     )
 
-    print(password)
+    click.echo(password)
 
 
 @main.command()
