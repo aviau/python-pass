@@ -117,7 +117,13 @@ def insert(config, path, multiline):
 @main.command()
 @click.option('--no-symbols', '-n', is_flag=True)
 @click.argument('pass_name', type=click.STRING)
-@click.argument('pass_length', type=int)
+@click.argument(
+    'pass_length',
+    type=int,
+    required=False,
+    envvar='PASSWORD_STORE_GENERATED_LENGTH',
+    default=25
+)
 @click.pass_obj
 def generate(config, pass_name, pass_length, no_symbols):
     symbols = not no_symbols

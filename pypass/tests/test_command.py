@@ -440,9 +440,9 @@ class TestCommand(unittest.TestCase):
         )
 
     def test_generate_no_symbols(self):
-        generate = self.run_cli(['generate', '-n', 'test.com', '20'])
+        generate = self.run_cli(['generate', '-n', 'test.com'])
         password = generate.output.strip()
-        self.assertIsNotNone(re.match('[a-zA-Z0-9]{20}$', password))
+        self.assertIsNotNone(re.match('[a-zA-Z0-9]{25}$', password))
 
         store = PasswordStore(self.dir)
         decoded = store.get_decrypted_password('test.com')
@@ -450,5 +450,5 @@ class TestCommand(unittest.TestCase):
 
     def test_generate_in_repo(self):
         self.run_cli(['git', 'init'])
-        self.run_cli(['generate', 'test.ca', '25'])
+        self.run_cli(['generate', 'test.ca', '20'])
         self.assertLastCommitMessage('Added test.ca to store')
