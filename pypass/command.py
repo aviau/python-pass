@@ -116,6 +116,7 @@ def insert(config, path, multiline):
 
 @main.command()
 @click.option('--no-symbols', '-n', is_flag=True)
+@click.option('--clip', '-c', is_flag=True)
 @click.option('--in-place', '-i', is_flag=True)
 @click.argument('pass_name', type=click.STRING)
 @click.argument(
@@ -126,7 +127,7 @@ def insert(config, path, multiline):
     default=25
 )
 @click.pass_obj
-def generate(config, pass_name, pass_length, no_symbols, in_place):
+def generate(config, pass_name, pass_length, no_symbols, clip, in_place):
     symbols = not no_symbols
 
     password = config['password_store'].generate_password(
@@ -143,7 +144,16 @@ def generate(config, pass_name, pass_length, no_symbols, in_place):
             message='Added %s to store' % pass_name
         )
 
-    click.echo(password)
+    if clip:
+        xclip = subprocess.Popen(
+            ['xclip', '-selection', 'clipboard'],
+            stdin=subprocess.PIPE
+        )
+        xclip.stdin.write(password.encode())
+        xclip.stdin.close()
+        click.echo('Copied %s to clipboard.' % pass_name)
+    else:
+        click.echo(password)
 
 
 @main.command()

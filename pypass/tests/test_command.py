@@ -467,3 +467,16 @@ class TestCommand(unittest.TestCase):
         new_password, _, remainder = new_content.partition('\n')
         self.assertEqual(len(new_password), 10)
         self.assertEqual(remainder, 'second')
+
+    @pypass.tests.skipIfTravis
+    def test_generate_clip(self):
+        generate = self.run_cli(['generate', '-c', 'clip.me'])
+
+        self.assertEqual(generate.output, 'Copied clip.me to clipboard.\n')
+
+        xclip = subprocess.Popen(
+            ['xclip', '-o', '-selection', 'clipboard'],
+            stdout=subprocess.PIPE
+        )
+        xclip.wait()
+        self.assertEqual(len(xclip.stdout.read().decode().strip()), 25)

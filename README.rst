@@ -148,6 +148,6 @@ This new command should connect to a server using an encrypted rsa key.
 - [X] ``pypass generate [pass-name] [pass-length]`` Genrates a new password using of length pass-length and inserts it into pass-name.
 - [X] ``pass-length`` argument is optional, defaults to 25, can be set with envvar ``PASSWORD_STORE_GENERATED_LENGTH``
 - [X] ``--no-symbols, -n``
-- [ ] ``--clip, -c``
+- [X] ``--clip, -c``
 - [X] ``--in-place, -i`` modify only the first line, fails if ``pass-name`` doesn't exist
 - [ ] ``--force, -f``
