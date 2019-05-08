@@ -151,6 +151,10 @@ class TestPasswordStore(unittest.TestCase):
             os.path.isdir(os.path.join(self.dir, 'A', 'B', 'C', 'D'))
         )
 
+    def test_get_decrypted_password_doesnt_exist(self):
+        store = PasswordStore(self.dir)
+        self.assertRaises(Exception, store.get_decrypted_password, 'nope.com')
+
     def test_init(self):
         init_dir = tempfile.mkdtemp()
         PasswordStore.init(
@@ -254,3 +258,21 @@ class TestPasswordStore(unittest.TestCase):
         store.generate_password('hundred.org', length=100)
         length_100 = store.get_decrypted_password('hundred.org')
         self.assertEqual(len(length_100), 100)
+
+    def test_generate_in_place(self):
+        store = PasswordStore(self.dir)
+
+        self.assertRaises(
+            Exception,
+            store.generate_password,
+            'nope.org',
+            first_line_only=True
+        )
+
+        store.insert_password('nope.org', 'pw\nremains intact')
+        store.generate_password('nope.org', length=3, first_line_only=True)
+
+        new_content = store.get_decrypted_password('nope.org')
+        new_password, _, remainder = new_content.partition('\n')
+        self.assertNotEqual(new_password, 'pw')
+        self.assertEqual(remainder, 'remains intact')

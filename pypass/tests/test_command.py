@@ -448,7 +448,22 @@ class TestCommand(unittest.TestCase):
         decoded = store.get_decrypted_password('test.com')
         self.assertEqual(decoded, password)
 
-    def test_generate_in_repo(self):
+    def test_generate_in_place(self):
         self.run_cli(['git', 'init'])
-        self.run_cli(['generate', 'test.ca', '20'])
-        self.assertLastCommitMessage('Added test.ca to store')
+        store = PasswordStore(self.dir)
+
+        generate = self.run_cli(
+            ['generate', '-i', 'in-place.com'],
+            expect_failure=True
+        )
+        self.assertNotEqual(generate.exit_code, 0)
+
+        store.insert_password('in-place.com', 'first\nsecond')
+        self.run_cli(['generate', '-i', 'in-place.com', '10'])
+
+        self.assertLastCommitMessage('Added in-place.com to store')
+
+        new_content = store.get_decrypted_password('in-place.com')
+        new_password, _, remainder = new_content.partition('\n')
+        self.assertEqual(len(new_password), 10)
+        self.assertEqual(remainder, 'second')

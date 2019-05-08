@@ -144,6 +144,8 @@ class PasswordStore(object):
                     return hostname.groups()[0]
             else:
                 return decrypted_password
+        else:
+            raise Exception('Couldn\'t decrypt %s' % path)
 
     def insert_password(self, path, password):
         """Encrypts the password at the given path
@@ -178,15 +180,28 @@ class PasswordStore(object):
         gpg.stdin.close()
         gpg.wait()
 
-    def generate_password(self, path, digits=True, symbols=True, length=25):
-        """Returns a random password
+    def generate_password(
+        self,
+        path,
+        digits=True,
+        symbols=True,
+        length=25,
+        first_line_only=False
+    ):
+        """Returns and stores a random password
 
         :param path: Where to insert the password. Ex: 'passwordstore.org'
         :param digits: Should the password have digits? Defaults to True
         :param symbols: Should the password have symbols? Defaults to True
         :param length: Length of the password. Defaults to 25
+        :param first_line_only: Modify only the first line of an existing entry
         :returns: Generated password.
         """
+        if first_line_only:
+            old_content = self.get_decrypted_password(path)
+            content_wo_pass = ''.join(old_content.partition('\n')[1:])
+        else:
+            content_wo_pass = ''
 
         chars = string.ascii_letters
 
@@ -198,7 +213,7 @@ class PasswordStore(object):
 
         password = ''.join(choice(chars) for i in range(length))
 
-        self.insert_password(path, password)
+        self.insert_password(path, password + content_wo_pass)
 
         return password
 

@@ -116,6 +116,7 @@ def insert(config, path, multiline):
 
 @main.command()
 @click.option('--no-symbols', '-n', is_flag=True)
+@click.option('--in-place', '-i', is_flag=True)
 @click.argument('pass_name', type=click.STRING)
 @click.argument(
     'pass_length',
@@ -125,14 +126,15 @@ def insert(config, path, multiline):
     default=25
 )
 @click.pass_obj
-def generate(config, pass_name, pass_length, no_symbols):
+def generate(config, pass_name, pass_length, no_symbols, in_place):
     symbols = not no_symbols
 
     password = config['password_store'].generate_password(
         pass_name,
         digits=True,
         symbols=symbols,
-        length=pass_length
+        length=pass_length,
+        first_line_only=in_place
     )
 
     if config['password_store'].uses_git:
