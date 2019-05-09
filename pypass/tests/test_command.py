@@ -441,7 +441,7 @@ class TestCommand(unittest.TestCase):
 
     def test_generate_no_symbols(self):
         generate = self.run_cli(['generate', '-n', 'test.com'])
-        password = generate.output.strip()
+        password = generate.output.partition('\n')[2].strip()
         self.assertIsNotNone(re.match('[a-zA-Z0-9]{25}$', password))
 
         store = PasswordStore(self.dir)
@@ -461,7 +461,9 @@ class TestCommand(unittest.TestCase):
         store.insert_password('in-place.com', 'first\nsecond')
         self.run_cli(['generate', '-i', 'in-place.com', '10'])
 
-        self.assertLastCommitMessage('Added in-place.com to store')
+        self.assertLastCommitMessage(
+            'Replace generated password for in-place.com.'
+        )
 
         new_content = store.get_decrypted_password('in-place.com')
         new_password, _, remainder = new_content.partition('\n')

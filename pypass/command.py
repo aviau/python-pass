@@ -141,7 +141,10 @@ def generate(config, pass_name, pass_length, no_symbols, clip, in_place):
     if config['password_store'].uses_git:
         config['password_store'].git_add_and_commit(
             pass_name + '.gpg',
-            message='Added %s to store' % pass_name
+            message='%s generated password for %s.' % (
+                'Replace' if in_place else 'Add',
+                pass_name
+            )
         )
 
     if clip:
@@ -153,7 +156,8 @@ def generate(config, pass_name, pass_length, no_symbols, clip, in_place):
         xclip.stdin.close()
         click.echo('Copied %s to clipboard.' % pass_name)
     else:
-        click.echo(password)
+        click.echo(
+            'The generated password for %s is:\n%s' % (pass_name, password))
 
 
 @main.command()
