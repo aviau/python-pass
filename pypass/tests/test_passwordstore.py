@@ -51,10 +51,16 @@ class TestPasswordStore(unittest.TestCase):
         shutil.rmtree(self.dir)
 
     def test_constructor(self):
+        # Construct on properly initialized directory
         store = PasswordStore(self.dir)
         self.assertEqual(store.gpg_id, '5C5833E3')
         self.assertFalse(store.uses_git)
         self.assertEqual(self.dir, store.path)
+
+        # Fail gracefully on missing .gpg-id
+        gpg_id_path = os.path.join(self.dir, '.gpg-id')
+        os.remove(gpg_id_path)
+        self.assertRaises(Exception, PasswordStore, self.dir)
 
     def test_get_passwords_list(self):
         store = PasswordStore(self.dir)
@@ -104,10 +110,17 @@ class TestPasswordStore(unittest.TestCase):
             store.get_decrypted_password('hello.com', entry=EntryType.password)
         )
 
-        store.insert_password('hello.com', 'sdf\npassword: pwd\nusername: bob')
+        store.insert_password(
+            'hello',
+            'sdf\npassword: pwd\nusername: bob\nhost: salut.fr'
+        )
         self.assertEqual(
             'bob',
-            store.get_decrypted_password('hello.com', entry=EntryType.username)
+            store.get_decrypted_password('hello', entry=EntryType.username)
+        )
+        self.assertEqual(
+            'salut.fr',
+            store.get_decrypted_password('hello', entry=EntryType.hostname)
         )
 
     def test_get_decrypted_password_only_password(self):

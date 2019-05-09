@@ -137,14 +137,14 @@ def edit(config, path):
     if path in config['password_store'].get_passwords_list():
         old_password = config['password_store'].get_decrypted_password(path)
         with tempfile.NamedTemporaryFile() as temp_file:
-            temp_file.write(old_password)
+            temp_file.write(old_password.encode())
             temp_file.flush()
 
             subprocess.call([config['editor'], temp_file.name])
             temp_file.seek(0)
 
             config['password_store'].insert_password(
-                path, temp_file.file.read()
+                path, temp_file.file.read().decode()
             )
             click.echo("%s was updated." % path)
 

@@ -33,10 +33,16 @@ from pypass.passwordstore import PasswordStore
 
 class TestCommand(unittest.TestCase):
 
-    def run_cli(self, args, input=None):
+    def run_cli(self, args, input=None, expect_failure=False):
         args = ['--PASSWORD_STORE_DIR', self.dir] + list(args)
         runner = click.testing.CliRunner()
         result = runner.invoke(pypass.command.main, args, input=input)
+        if result.exit_code != 0 and not expect_failure:
+            if result.exception is not None:
+                raise result.exception
+            else:
+                raise Exception(
+                    'Invoking "pypass {}" failed'.format(' '.join(args)))
         return result
 
     def setUp(self):
@@ -107,6 +113,7 @@ class TestCommand(unittest.TestCase):
         # Show the password for test.com
         show_result = self.run_cli(
             ['show', 'test.com'],
+            expect_failure=True
         )
 
         self.assertEqual(show_result.output,
@@ -131,6 +138,16 @@ class TestCommand(unittest.TestCase):
             stdout=subprocess.PIPE)
         xclip.wait()
         self.assertEqual(xclip.stdout.read().decode('utf8'), 'clipme999')
+
+    def test_edit(self):
+        store = PasswordStore(self.dir)
+        store.insert_password('test.com', 'editme')
+
+        mock_editor = os.path.join(os.path.dirname(__file__), 'mock_editor.py')
+        self.run_cli(['--EDITOR', mock_editor, 'edit', 'test.com'])
+
+        edited_content = store.get_decrypted_password('test.com')
+        self.assertEqual(edited_content, 'edited')
 
     def test_edit_not_exist(self):
         edit_result = self.run_cli(
@@ -330,6 +347,40 @@ class TestCommand(unittest.TestCase):
         gpg.wait()
         self.assertEqual(gpg.stdout.read().decode(), 'gpg -d\n')
 
+    def test_git_init_insert_and_show(self):
+        self.run_cli(['git', 'init'])
+
+        self.run_cli(
+            ['insert', 'test.com'],
+            input='super_secret\nsuper_secret'
+        )
+
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.dir, 'test.com.gpg'))
+        )
+
+        git_log = subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(self.dir, '.git'),
+                '--work-tree=%s' % self.dir,
+                'log', '-1', '--pretty=%B'
+            ],
+            shell=False,
+            stdout=subprocess.PIPE
+        )
+        git_log.wait()
+        self.assertEqual(
+            git_log.stdout.read().decode(),
+            'Added test.com to store\n\n'
+        )
+
+        show_result = self.run_cli(
+            ['show', 'test.com'],
+            input='super_secret\nsuper_secret'
+        )
+        self.assertEqual(show_result.output, 'super_secret\n')
+
     def test_init_clone(self):
         # Setup origin repo
         origin_dir = tempfile.mkdtemp()
@@ -390,3 +441,8 @@ class TestCommand(unittest.TestCase):
                 os.path.join(self.dir, '.gpg-id')
             )
         )
+
+    def test_generate_no_symbols(self):
+        generate = self.run_cli(['generate', '-n', 'test.com', '20'])
+        password = generate.output.strip()
+        self.assertIsNotNone(re.match('[a-zA-Z0-9]{20}$', password))
