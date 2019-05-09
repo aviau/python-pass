@@ -416,8 +416,8 @@ def mv(config, old_path, new_path):
             click.echo("Error: %s is not in the password store" % old_path)
 
 
-@main.command(context_settings={'allow_interspersed_args': False})
-@click.argument('commands', nargs=-1)
+@main.command(context_settings={'ignore_unknown_options': True})
+@click.argument('commands', nargs=-1, type=click.UNPROCESSED)
 @click.pass_obj
 def git(config, commands):
     command_list = list(commands)
