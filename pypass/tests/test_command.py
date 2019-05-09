@@ -378,6 +378,16 @@ class TestCommand(unittest.TestCase):
         )
         self.assertEqual(show_result.output, 'super_secret\n')
 
+    def test_git_forward_options(self):
+        self.run_cli(['git', 'init'])
+        self.run_cli(
+            ['insert', 'test.com'],
+            input='super_secret\nsuper_secret'
+        )
+
+        self.run_cli(['git', 'commit', '--amend', '-m', 'Modified message.'])
+        self.assertLastCommitMessage('Modified message.')
+
     def test_init_clone(self):
         # Setup origin repo
         origin_dir = tempfile.mkdtemp()
