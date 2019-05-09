@@ -115,19 +115,49 @@ def insert(config, path, multiline):
 
 
 @main.command()
-@click.option('--no-symbols', '-n', is_flag=True, default=False)
+@click.option('--no-symbols', '-n', is_flag=True)
+@click.option('--clip', '-c', is_flag=True)
+@click.option('--in-place', '-i', is_flag=True)
 @click.argument('pass_name', type=click.STRING)
-@click.argument('pass_length', type=int)
-def generate(pass_name, pass_length, no_symbols):
+@click.argument(
+    'pass_length',
+    type=int,
+    required=False,
+    envvar='PASSWORD_STORE_GENERATED_LENGTH',
+    default=25
+)
+@click.pass_obj
+def generate(config, pass_name, pass_length, no_symbols, clip, in_place):
     symbols = not no_symbols
 
-    password = PasswordStore.generate_password(
+    password = config['password_store'].generate_password(
+        pass_name,
         digits=True,
         symbols=symbols,
-        length=pass_length
+        length=pass_length,
+        first_line_only=in_place
     )
 
-    print(password)
+    if config['password_store'].uses_git:
+        config['password_store'].git_add_and_commit(
+            pass_name + '.gpg',
+            message='%s generated password for %s.' % (
+                'Replace' if in_place else 'Add',
+                pass_name
+            )
+        )
+
+    if clip:
+        xclip = subprocess.Popen(
+            ['xclip', '-selection', 'clipboard'],
+            stdin=subprocess.PIPE
+        )
+        xclip.stdin.write(password.encode())
+        xclip.stdin.close()
+        click.echo('Copied %s to clipboard.' % pass_name)
+    else:
+        click.echo(
+            'The generated password for %s is:\n%s' % (pass_name, password))
 
 
 @main.command()

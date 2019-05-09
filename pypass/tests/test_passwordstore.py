@@ -151,6 +151,10 @@ class TestPasswordStore(unittest.TestCase):
             os.path.isdir(os.path.join(self.dir, 'A', 'B', 'C', 'D'))
         )
 
+    def test_get_decrypted_password_doesnt_exist(self):
+        store = PasswordStore(self.dir)
+        self.assertRaises(Exception, store.get_decrypted_password, 'nope.com')
+
     def test_init(self):
         init_dir = tempfile.mkdtemp()
         PasswordStore.init(
@@ -239,17 +243,36 @@ class TestPasswordStore(unittest.TestCase):
         shutil.rmtree(destination_dir)
 
     def test_generate_password(self):
-        only_letters = PasswordStore.generate_password(
-            digits=False,
-            symbols=False
-        )
+        store = PasswordStore(self.dir)
 
+        store.generate_password('letters.net', digits=False, symbols=False)
+        only_letters = store.get_decrypted_password('letters.net')
         self.assertTrue(only_letters.isalpha())
 
-        alphanum = PasswordStore.generate_password(digits=True, symbols=False)
+        store.generate_password('alphanum.co.uk', digits=True, symbols=False)
+        alphanum = store.get_decrypted_password('alphanum.co.uk')
         self.assertTrue(alphanum.isalnum())
         for char in alphanum:
             self.assertTrue(char not in string.punctuation)
 
-        length_100 = PasswordStore.generate_password(length=100)
+        store.generate_password('hundred.org', length=100)
+        length_100 = store.get_decrypted_password('hundred.org')
         self.assertEqual(len(length_100), 100)
+
+    def test_generate_in_place(self):
+        store = PasswordStore(self.dir)
+
+        self.assertRaises(
+            Exception,
+            store.generate_password,
+            'nope.org',
+            first_line_only=True
+        )
+
+        store.insert_password('nope.org', 'pw\nremains intact')
+        store.generate_password('nope.org', length=3, first_line_only=True)
+
+        new_content = store.get_decrypted_password('nope.org')
+        new_password, _, remainder = new_content.partition('\n')
+        self.assertNotEqual(new_password, 'pw')
+        self.assertEqual(remainder, 'remains intact')

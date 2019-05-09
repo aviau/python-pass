@@ -45,6 +45,20 @@ class TestCommand(unittest.TestCase):
                     'Invoking "pypass {}" failed'.format(' '.join(args)))
         return result
 
+    def assertLastCommitMessage(self, text):
+        git_log = subprocess.Popen(
+            [
+                'git',
+                '--git-dir=%s' % os.path.join(self.dir, '.git'),
+                '--work-tree=%s' % self.dir,
+                'log', '-1', '--pretty=%B'
+            ],
+            shell=False,
+            stdout=subprocess.PIPE
+        )
+        git_log.wait()
+        self.assertEqual(git_log.stdout.read().decode(), text + '\n\n')
+
     def setUp(self):
         self.dir = tempfile.mkdtemp()
 
@@ -355,25 +369,8 @@ class TestCommand(unittest.TestCase):
             input='super_secret\nsuper_secret'
         )
 
-        self.assertTrue(
-            os.path.isfile(os.path.join(self.dir, 'test.com.gpg'))
-        )
-
-        git_log = subprocess.Popen(
-            [
-                'git',
-                '--git-dir=%s' % os.path.join(self.dir, '.git'),
-                '--work-tree=%s' % self.dir,
-                'log', '-1', '--pretty=%B'
-            ],
-            shell=False,
-            stdout=subprocess.PIPE
-        )
-        git_log.wait()
-        self.assertEqual(
-            git_log.stdout.read().decode(),
-            'Added test.com to store\n\n'
-        )
+        self.assertTrue(os.path.isfile(os.path.join(self.dir, 'test.com.gpg')))
+        self.assertLastCommitMessage('Added test.com to store')
 
         show_result = self.run_cli(
             ['show', 'test.com'],
@@ -443,6 +440,45 @@ class TestCommand(unittest.TestCase):
         )
 
     def test_generate_no_symbols(self):
-        generate = self.run_cli(['generate', '-n', 'test.com', '20'])
-        password = generate.output.strip()
-        self.assertIsNotNone(re.match('[a-zA-Z0-9]{20}$', password))
+        generate = self.run_cli(['generate', '-n', 'test.com'])
+        password = generate.output.partition('\n')[2].strip()
+        self.assertIsNotNone(re.match('[a-zA-Z0-9]{25}$', password))
+
+        store = PasswordStore(self.dir)
+        decoded = store.get_decrypted_password('test.com')
+        self.assertEqual(decoded, password)
+
+    def test_generate_in_place(self):
+        self.run_cli(['git', 'init'])
+        store = PasswordStore(self.dir)
+
+        generate = self.run_cli(
+            ['generate', '-i', 'in-place.com'],
+            expect_failure=True
+        )
+        self.assertNotEqual(generate.exit_code, 0)
+
+        store.insert_password('in-place.com', 'first\nsecond')
+        self.run_cli(['generate', '-i', 'in-place.com', '10'])
+
+        self.assertLastCommitMessage(
+            'Replace generated password for in-place.com.'
+        )
+
+        new_content = store.get_decrypted_password('in-place.com')
+        new_password, _, remainder = new_content.partition('\n')
+        self.assertEqual(len(new_password), 10)
+        self.assertEqual(remainder, 'second')
+
+    @pypass.tests.skipIfTravis
+    def test_generate_clip(self):
+        generate = self.run_cli(['generate', '-c', 'clip.me'])
+
+        self.assertEqual(generate.output, 'Copied clip.me to clipboard.\n')
+
+        xclip = subprocess.Popen(
+            ['xclip', '-o', '-selection', 'clipboard'],
+            stdout=subprocess.PIPE
+        )
+        xclip.wait()
+        self.assertEqual(len(xclip.stdout.read().decode().strip()), 25)
