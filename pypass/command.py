@@ -88,10 +88,14 @@ def init(path, clone, gpg_id):
 
 
 @main.command()
+@click.option('--echo', '-e', is_flag=True)
 @click.option('--multiline', '-m', is_flag=True)
 @click.argument('path', type=click.STRING)
 @click.pass_obj
-def insert(config, path, multiline):
+def insert(config, path, echo, multiline):
+
+    if echo and multiline:
+        sys.exit('--echo and --multiline are mutually exclusive.')
 
     if multiline:
         click.echo(
@@ -100,18 +104,23 @@ def insert(config, path, multiline):
         password = ''.join(sys.stdin)
     else:
         password = click.prompt(
-            'Enter the password',
-            type=str,
-            confirmation_prompt=True,
-            hide_input=True
+            'Enter password for %s' % path,
+            hide_input=not echo
         )
+        if not echo:
+            confirmation = click.prompt(
+                'Retype password for %s' % path,
+                hide_input=True
+            )
+            if confirmation != password:
+                sys.exit('Error: the entered passwords do not match.')
 
     config['password_store'].insert_password(path, password)
 
     if config['password_store'].uses_git:
         config['password_store'].git_add_and_commit(
             path + '.gpg',
-            message='Added %s to store' % path
+            message='Add given password for %s to store.' % path
         )
 
 

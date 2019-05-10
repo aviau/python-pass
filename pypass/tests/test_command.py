@@ -105,11 +105,31 @@ class TestCommand(unittest.TestCase):
         shutil.rmtree(init_dir)
 
     def test_insert(self):
+        # Multiline input should end at EOF
         self.run_cli(['insert', '-m', 'test.com'], input='first\nsecond\n')
 
         store = PasswordStore(self.dir)
         content = store.get_decrypted_password('test.com')
         self.assertEqual(content, 'first\nsecond\n')
+
+        # Echo the password and ask for it only once
+        insert2 = self.run_cli(['insert', '-e', 'test2.com'], input='oneLine')
+
+        self.assertEqual(
+            insert2.output,
+            'Enter password for test2.com: oneLine\n'
+        )
+
+        content2 = store.get_decrypted_password('test2.com')
+        self.assertEqual(content2, 'oneLine')
+
+        # Mismatching inputs should cause abort
+        insert3 = self.run_cli(
+            ['insert', 'test3.com'],
+            input='aWildPassword\nDoesntMatch',
+            expect_failure=True
+        )
+        self.assertNotEqual(insert3.exit_code, 0)
 
     def test_insert_and_show(self):
         # Insert a password for test.com
@@ -377,7 +397,9 @@ class TestCommand(unittest.TestCase):
         )
 
         self.assertTrue(os.path.isfile(os.path.join(self.dir, 'test.com.gpg')))
-        self.assertLastCommitMessage('Added test.com to store')
+        self.assertLastCommitMessage(
+            'Add given password for test.com to store.'
+        )
 
         show_result = self.run_cli(
             ['show', 'test.com'],
