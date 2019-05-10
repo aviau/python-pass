@@ -104,6 +104,13 @@ class TestCommand(unittest.TestCase):
 
         shutil.rmtree(init_dir)
 
+    def test_insert(self):
+        self.run_cli(['insert', '-m', 'test.com'], input='first\nsecond\n')
+
+        store = PasswordStore(self.dir)
+        content = store.get_decrypted_password('test.com')
+        self.assertEqual(content, 'first\nsecond\n')
+
     def test_insert_and_show(self):
         # Insert a password for test.com
         self.run_cli(

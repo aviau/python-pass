@@ -94,9 +94,10 @@ def init(path, clone, gpg_id):
 def insert(config, path, multiline):
 
     if multiline:
-        with tempfile.NamedTemporaryFile() as temp_file:
-            if subprocess.call([config['editor'], temp_file.name]) == 0:
-                password = temp_file.read().strip()
+        click.echo(
+            'Enter contents of %s and press Ctrl+D when finished:\n' % path
+        )
+        password = ''.join(sys.stdin)
     else:
         password = click.prompt(
             'Enter the password',
