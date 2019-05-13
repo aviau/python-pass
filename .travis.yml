@@ -4,33 +4,42 @@ matrix:
     - python: 2.7
       env:
         - TOX_ENV=py27
+        - DISPLAY=:99.0
     - python: 3.6
       env:
         - TOX_ENV=py36
+        - DISPLAY=:99.0
     - python: 3.7
       dist: xenial
       env:
         - TOX_ENV=py37
+        - DISPLAY=:99.0
     - python: pypy
       env:
         - TOX_ENV=pypy
+        - DISPLAY=:99.0
     - python: pypy3
       env:
         - TOX_ENV=pypy3
+        - DISPLAY=:99.0
     - env:
         - TOX_ENV=flake8
     - env:
         - TOX_ENV=docs
     - env:
         - TOX_ENV=coverage
+        - DISPLAY=:99.0
 install:
   - sudo apt-get install -y gnupg2
   - make setup_gpg
   - git config --global user.email "you@example.com"
   - git config --global user.name "Your Name"
   - sudo apt-get install -y tree
+  - sudo apt-get install -y xclip
   - sudo pip install tox
   - sudo pip install coveralls
+before_script:
+  - Xvfb :99 &
 script:
   - tox -e $TOX_ENV
 after_success:
