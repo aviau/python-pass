@@ -119,7 +119,7 @@ def insert(config, path, echo, multiline):
 
     if config['password_store'].uses_git:
         config['password_store'].git_add_and_commit(
-            path + '.gpg',
+            [path + '.gpg'],
             message='Add given password for %s to store.' % path
         )
 
@@ -150,7 +150,7 @@ def generate(config, pass_name, pass_length, no_symbols, clip, in_place):
 
     if config['password_store'].uses_git:
         config['password_store'].git_add_and_commit(
-            pass_name + '.gpg',
+            [pass_name + '.gpg'],
             message='%s generated password for %s.' % (
                 'Replace' if in_place else 'Add',
                 pass_name
@@ -190,7 +190,7 @@ def edit(config, path):
 
             if config['password_store'].uses_git:
                 config['password_store'].git_add_and_commit(
-                    path + '.gpg',
+                    [path + '.gpg'],
                     message='Edited password for %s using %s'
                             % (path, config['editor'])
                 )

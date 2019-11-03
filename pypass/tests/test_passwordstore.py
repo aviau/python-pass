@@ -24,6 +24,8 @@ import subprocess
 import string
 import tempfile
 
+from dulwich import porcelain
+
 from pypass import PasswordStore
 from pypass import EntryType
 
@@ -186,37 +188,12 @@ class TestPasswordStore(unittest.TestCase):
         origin_dir = tempfile.mkdtemp()
         destination_dir = tempfile.mkdtemp()
 
-        subprocess.Popen(
-            [
-                'git',
-                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
-                '--work-tree=%s' % origin_dir,
-                'init',
-                origin_dir
-            ],
-            shell=False
-        ).wait()
+        porcelain.init(origin_dir)
 
         open(os.path.join(origin_dir, 'test_git_init_clone.gpg'), 'a').close()
 
-        subprocess.Popen(
-            [
-                'git',
-                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
-                '--work-tree=%s' % origin_dir,
-                'add', 'test_git_init_clone.gpg',
-            ]
-        ).wait()
-
-        subprocess.Popen(
-            [
-                'git',
-                '--git-dir=%s' % os.path.join(origin_dir, '.git'),
-                '--work-tree=%s' % origin_dir,
-                'commit',
-                '-m', '"testcommit"',
-            ]
-        ).wait()
+        porcelain.add(origin_dir, [os.path.join(origin_dir, 'test_git_init_clone.gpg')])
+        porcelain.commit(origin_dir, message="testcommit")
 
         # Init
         PasswordStore.init(

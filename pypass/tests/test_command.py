@@ -26,6 +26,8 @@ import unittest
 
 import click.testing
 
+from dulwich import porcelain
+
 import pypass.command
 import pypass.tests
 from pypass.passwordstore import PasswordStore
@@ -420,39 +422,13 @@ class TestCommand(unittest.TestCase):
     def test_init_clone(self):
         # Setup origin repo
         origin_dir = tempfile.mkdtemp()
-        origin_git_dir = os.path.join(origin_dir, '.git')
 
-        subprocess.Popen(
-            [
-                'git',
-                '--git-dir=%s' % origin_git_dir,
-                '--work-tree=%s' % origin_dir,
-                'init',
-                origin_dir
-            ],
-            shell=False
-        ).wait()
+        porcelain.init(origin_dir)
 
         open(os.path.join(origin_dir, 'test_git_init_clone.gpg'), 'a').close()
 
-        subprocess.call(
-            [
-                'git',
-                '--git-dir=%s' % origin_git_dir,
-                '--work-tree=%s' % origin_dir,
-                'add', 'test_git_init_clone.gpg',
-            ]
-        )
-
-        subprocess.call(
-            [
-                'git',
-                '--git-dir=%s' % origin_git_dir,
-                '--work-tree=%s' % origin_dir,
-                'commit',
-                '-m', '"testcommit"',
-            ]
-        )
+        porcelain.add(origin_dir, [os.path.join(origin_dir, 'test_git_init_clone.gpg')])
+        porcelain.commit(origin_dir, message="testcommit")
 
         # Init
         self.run_cli(

@@ -22,6 +22,8 @@ import subprocess
 import string
 import re
 
+from dulwich import porcelain
+
 from .entry_type import EntryType
 
 # Secure source of randomness for password generation
@@ -230,8 +232,6 @@ class PasswordStore(object):
                           Example: ssh://myserver.net:/home/bob/.password-store
         :returns: PasswordStore object
         """
-        git_dir = os.path.join(path, '.git')
-        git_work_tree = path
 
         # Create a folder at the path
         if not os.path.exists(path):
@@ -239,44 +239,7 @@ class PasswordStore(object):
 
         # Clone an existing remote repo
         if clone_url:
-            # Init git repo
-            subprocess.call(
-                [
-                    "git",
-                    "--git-dir=%s" % git_dir,
-                    "--work-tree=%s" % git_work_tree,
-                    "init", path
-                ],
-                shell=False
-            )
-
-            # Add remote repo
-            subprocess.call(
-                [
-                    "git",
-                    "--git-dir=%s" % git_dir,
-                    "--work-tree=%s" % git_work_tree,
-                    "remote",
-                    "add",
-                    "origin",
-                    clone_url
-                ],
-                shell=False,
-            )
-
-            # Pull remote repo
-            # TODO: add parameters for remote and branch ?
-            subprocess.call(
-                [
-                    "git",
-                    "--git-dir=%s" % git_dir,
-                    "--work-tree=%s" % git_work_tree,
-                    "pull",
-                    "origin",
-                    "master"
-                ],
-                shell=False
-            )
+            porcelain.clone(clone_url, target=path)
 
         gpg_id_path = os.path.join(path, '.gpg-id')
         if os.path.exists(gpg_id_path) is False:
@@ -297,18 +260,10 @@ class PasswordStore(object):
         self.git_dir = git_dir or os.path.join(self.path, '.git')
         self.uses_git = True
 
-        subprocess.call(
-            [
-                'git',
-                "--git-dir=%s" % self.git_dir,
-                "--work-tree=%s" % self.path,
-                'init',
-            ],
-            shell=False
-        )
+        porcelain.init(self.path)
 
         self.git_add_and_commit(
-            '.',
+            ['.'],
             message="Add current contents of password store."
         )
 
@@ -319,68 +274,10 @@ class PasswordStore(object):
             gitattributes.write('*.gpg diff=gpg\n')
 
         self.git_add_and_commit(
-            '.gitattributes',
+            ['.gitattributes'],
             message="Configure git repository for gpg file diff."
         )
 
-        subprocess.call(
-            [
-                'git',
-                "--git-dir=%s" % self.git_dir,
-                "--work-tree=%s" % self.path,
-                'config',
-                '--local',
-                'diff.gpg.binary',
-                'true'
-            ],
-            shell=False
-        )
-
-        subprocess.call(
-            [
-                'git',
-                "--git-dir=%s" % self.git_dir,
-                "--work-tree=%s" % self.path,
-                'config',
-                '--local',
-                'diff.gpg.textconv',
-                'gpg -d'
-            ],
-            shell=False
-        )
-
-    def git_add_and_commit(self, path, message=None):
-
-        subprocess.call(
-            [
-                'git',
-                "--git-dir=%s" % self.git_dir,
-                "--work-tree=%s" % self.path,
-                'add',
-                path
-            ],
-            shell=False
-        )
-
-        if message:
-            subprocess.call(
-                [
-                    'git',
-                    "--git-dir=%s" % self.git_dir,
-                    "--work-tree=%s" % self.path,
-                    'commit',
-                    '-m',
-                    message
-                ],
-                shell=False
-            )
-        else:
-            subprocess.call(
-                [
-                    'git',
-                    "--git-dir=%s" % self.git_dir,
-                    "--work-tree=%s" % self.path,
-                    'commit'
-                ],
-                shell=False
-            )
+    def git_add_and_commit(self, files, message=None):
+        porcelain.add(self.path, [os.path.join(self.path, file_name) for file_name in files])
+        porcelain.commit(self.path, message=message)

@@ -2,3 +2,4 @@ click
 colorama
 enum34
 pexpect
+dulwich
