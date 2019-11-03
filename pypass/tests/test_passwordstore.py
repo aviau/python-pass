@@ -20,7 +20,6 @@
 import unittest
 import os
 import shutil
-import subprocess
 import string
 import tempfile
 
@@ -192,7 +191,10 @@ class TestPasswordStore(unittest.TestCase):
 
         open(os.path.join(origin_dir, 'test_git_init_clone.gpg'), 'a').close()
 
-        porcelain.add(origin_dir, [os.path.join(origin_dir, 'test_git_init_clone.gpg')])
+        porcelain.add(
+            origin_dir,
+            [os.path.join(origin_dir, 'test_git_init_clone.gpg')]
+        )
         porcelain.commit(origin_dir, message="testcommit")
 
         # Init

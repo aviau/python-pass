@@ -427,7 +427,10 @@ class TestCommand(unittest.TestCase):
 
         open(os.path.join(origin_dir, 'test_git_init_clone.gpg'), 'a').close()
 
-        porcelain.add(origin_dir, [os.path.join(origin_dir, 'test_git_init_clone.gpg')])
+        porcelain.add(
+            origin_dir,
+            [os.path.join(origin_dir, 'test_git_init_clone.gpg')]
+        )
         porcelain.commit(origin_dir, message="testcommit")
 
         # Init

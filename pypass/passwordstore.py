@@ -279,5 +279,8 @@ class PasswordStore(object):
         )
 
     def git_add_and_commit(self, files, message=None):
-        porcelain.add(self.path, [os.path.join(self.path, file_name) for file_name in files])
+        porcelain.add(
+            self.path,
+            [os.path.join(self.path, file_name) for file_name in files]
+        )
         porcelain.commit(self.path, message=message)
