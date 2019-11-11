@@ -36,16 +36,12 @@ from pypass import PasswordStore
               envvar='PASSWORD_STORE_DIR',
               default=os.path.join(os.getenv("HOME"), ".password-store"),
               type=click.Path(file_okay=False, resolve_path=True))
-@click.option('--PASSWORD_STORE_GIT',
-              envvar='PASSWORD_STORE_GIT',
-              type=click.Path(file_okay=False, resolve_path=True),
-              default=None)
 @click.option('--EDITOR',
               envvar='EDITOR',
               default='editor',
               type=click.STRING)
 @click.pass_context
-def main(ctx, password_store_dir, password_store_git, editor):
+def main(ctx, password_store_dir, editor):
 
     # init does not need any of this.
     if ctx.invoked_subcommand == "init":
@@ -54,8 +50,7 @@ def main(ctx, password_store_dir, password_store_git, editor):
     # Prepare the config file
     config = {
         'password_store': PasswordStore(
-            path=password_store_dir,
-            git_dir=password_store_git
+            path=password_store_dir
         ),
         'editor': editor
     }
@@ -438,7 +433,8 @@ def git(config, commands):
         subprocess.call(
             [
                 'git',
-                '--git-dir=%s' % config['password_store'].git_dir,
+                '--git-dir=%s' % os.path.join(
+                    config['password_store'].path, '.git'),
                 '--work-tree=%s' % config['password_store'].path,
             ] + command_list,
             shell=False,

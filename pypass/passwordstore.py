@@ -22,9 +22,8 @@ import subprocess
 import string
 import re
 
-from dulwich import porcelain
-
 from .entry_type import EntryType
+from .git_backend import DulwichGitBackend, SubprocessGitBackend
 
 # Secure source of randomness for password generation
 try:
@@ -54,14 +53,16 @@ class PasswordStore(object):
 
     :param path: The path of the password-store. By default,
                  '$home/.password-store'.
-    :param git_dir: The git directory of the password store. By default,
-                    it looks for a .git directory in the password store.
     """
+    try:
+        git_backend = DulwichGitBackend()
+    except Exception as e:
+        print("Could not initialize Dulwich git backend: {}".format(e))
+        git_backend = SubprocessGitBackend()
 
     def __init__(
             self,
-            path=os.path.join(os.getenv("HOME"), ".password-store"),
-            git_dir=None,
+            path=os.path.join(os.getenv("HOME"), ".password-store")
     ):
         self.path = path
 
@@ -74,10 +75,7 @@ class PasswordStore(object):
             raise Exception("could not find .gpg-id file")
 
         # Try to locate the git dir
-        git_dir = git_dir or os.path.join(self.path, '.git')
-        self.uses_git = os.path.isdir(git_dir)
-        if self.uses_git:
-            self.git_dir = git_dir
+        self.uses_git = os.path.isdir(os.path.join(self.path, '.git'))
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store
@@ -239,7 +237,7 @@ class PasswordStore(object):
 
         # Clone an existing remote repo
         if clone_url:
-            porcelain.clone(clone_url, target=path)
+            PasswordStore.git_backend.clone(clone_url, target=path)
 
         gpg_id_path = os.path.join(path, '.gpg-id')
         if os.path.exists(gpg_id_path) is False:
@@ -249,18 +247,12 @@ class PasswordStore(object):
 
         return PasswordStore(path)
 
-    def git_init(self, git_dir=None):
-        """Transform  the existing password store into a git repository
+    def git_init(self):
+        """Transform  the existing password store into a git repository"""
 
-        :param git_dir: Where to create the git directory. By default, it will
-                        be created at the root of the password store in a .git
-                        folder.
-        """
-
-        self.git_dir = git_dir or os.path.join(self.path, '.git')
         self.uses_git = True
 
-        porcelain.init(self.path)
+        PasswordStore.git_backend.init(self.path)
 
         self.git_add_and_commit(
             ['.'],
@@ -279,8 +271,8 @@ class PasswordStore(object):
         )
 
     def git_add_and_commit(self, files, message=None):
-        porcelain.add(
+        PasswordStore.git_backend.add(
             self.path,
             [os.path.join(self.path, file_name) for file_name in files]
         )
-        porcelain.commit(self.path, message=message)
+        PasswordStore.git_backend.commit(self.path, message=message)
