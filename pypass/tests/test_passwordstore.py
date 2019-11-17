@@ -27,6 +27,7 @@ import tempfile
 from pypass import PasswordStore
 from pypass import EntryType
 
+from ..passwordstore import GPG_BIN
 
 class TestPasswordStore(unittest.TestCase):
 
@@ -45,6 +46,10 @@ class TestPasswordStore(unittest.TestCase):
         # Create one folder
         email_folder_path = os.path.join(self.dir, 'Email')
         os.mkdir(email_folder_path)
+        # .gpg_id file in subfolder
+        with open(os.path.join(email_folder_path, '.gpg-id'), 'w') as gpg_id_file:
+            gpg_id_file.write('86B4789B')
+
         open(os.path.join(email_folder_path, 'email.com.gpg'), 'a').close()
 
     def tearDown(self):
@@ -53,7 +58,8 @@ class TestPasswordStore(unittest.TestCase):
     def test_constructor(self):
         # Construct on properly initialized directory
         store = PasswordStore(self.dir)
-        self.assertEqual(store.gpg_id, '5C5833E3')
+        self.assertEqual(store._get_gpg_id(self.dir), '5C5833E3')
+        self.assertEqual(store._get_gpg_id(os.path.join(self.dir, 'Email')), '86B4789B')
         self.assertFalse(store.uses_git)
         self.assertEqual(self.dir, store.path)
 
@@ -258,6 +264,37 @@ class TestPasswordStore(unittest.TestCase):
         store.generate_password('hundred.org', length=100)
         length_100 = store.get_decrypted_password('hundred.org')
         self.assertEqual(len(length_100), 100)
+
+    def test_generate_password_uses_correct_gpg_id(self):
+        store = PasswordStore(self.dir)
+
+        def get_gpg_ids_used(filename):
+            gpg = subprocess.Popen(
+                [
+                    GPG_BIN,
+                    '--list-packets',
+                    os.path.join(self.dir, filename)
+                ],
+                shell=False,
+                stdout=subprocess.PIPE
+            )
+            gpg.wait()
+            pubkeys = []
+            for line in gpg.stdout.readlines():
+                if line.startswith(':pubkey'):
+                    pubkeys.append(line.split()[-1])
+
+            return pubkeys
+
+        store.generate_password('should_use_main_key')
+        pubkeys = get_gpg_ids_used('should_use_main_key.gpg')
+        self.assertTrue(len(pubkeys) == 1)
+        self.assertEqual(pubkeys[0], '6C8110881C10BC07')
+
+        store.generate_password('Email/should_use_secondary_key')
+        pubkeys = get_gpg_ids_used(os.path.join('Email', 'should_use_secondary_key.gpg'))
+        self.assertTrue(len(pubkeys) == 1)
+        self.assertEqual(pubkeys[0], '4B52397C4C1C5D70')
 
     def test_generate_in_place(self):
         store = PasswordStore(self.dir)

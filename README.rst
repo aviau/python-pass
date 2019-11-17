@@ -70,7 +70,7 @@ Comming soon.
 - [X] ``pypass insert test.com`` prompts for a password and creates a test.com.gpg file
 - [X] multi-line support
 - [X] create a git commit
-- [ ] When inserting in a folder with a .gpg-id file, insert should use the .gpg-id file's key
+- [X] When inserting in a folder with a .gpg-id file, insert should use the .gpg-id file's key
 
 ``pypass show``
 ---------------
