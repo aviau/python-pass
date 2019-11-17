@@ -29,6 +29,7 @@ from pypass import EntryType
 
 from ..passwordstore import GPG_BIN
 
+
 class TestPasswordStore(unittest.TestCase):
 
     def setUp(self):
@@ -47,7 +48,8 @@ class TestPasswordStore(unittest.TestCase):
         email_folder_path = os.path.join(self.dir, 'Email')
         os.mkdir(email_folder_path)
         # .gpg_id file in subfolder
-        with open(os.path.join(email_folder_path, '.gpg-id'), 'w') as gpg_id_file:
+        gpg_path = os.path.join(email_folder_path, '.gpg-id')
+        with open(gpg_path, 'w') as gpg_id_file:
             gpg_id_file.write('86B4789B')
 
         open(os.path.join(email_folder_path, 'email.com.gpg'), 'a').close()
@@ -59,7 +61,8 @@ class TestPasswordStore(unittest.TestCase):
         # Construct on properly initialized directory
         store = PasswordStore(self.dir)
         self.assertEqual(store._get_gpg_id(self.dir), '5C5833E3')
-        self.assertEqual(store._get_gpg_id(os.path.join(self.dir, 'Email')), '86B4789B')
+        email_path = os.path.join(self.dir, 'Email')
+        self.assertEqual(store._get_gpg_id(email_path), '86B4789B')
         self.assertFalse(store.uses_git)
         self.assertEqual(self.dir, store.path)
 
@@ -281,6 +284,7 @@ class TestPasswordStore(unittest.TestCase):
             gpg.wait()
             pubkeys = []
             for line in gpg.stdout.readlines():
+                line = line.decode()
                 if line.startswith(':pubkey'):
                     pubkeys.append(line.split()[-1])
 
@@ -292,7 +296,9 @@ class TestPasswordStore(unittest.TestCase):
         self.assertEqual(pubkeys[0], '6C8110881C10BC07')
 
         store.generate_password('Email/should_use_secondary_key')
-        pubkeys = get_gpg_ids_used(os.path.join('Email', 'should_use_secondary_key.gpg'))
+        pubkeys = get_gpg_ids_used(
+            os.path.join('Email', 'should_use_secondary_key.gpg')
+        )
         self.assertTrue(len(pubkeys) == 1)
         self.assertEqual(pubkeys[0], '4B52397C4C1C5D70')
 

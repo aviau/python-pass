@@ -77,10 +77,13 @@ class PasswordStore(object):
 
         try:
             # Requires at least Python 3.5
-            return os.path.commonpath([self.path]) == os.path.commonpath([self.path, child_path])
+            store_commonpath = os.path.commonpath([self.path])
+            child_commonpath = os.path.commonpath([self.path, child_path])
+            return store_commonpath == child_commonpath
         except AttributeError:
             # Pre-3.5 fallback
-            return os.path.commonprefix([self.path, child_path]).startswith(self.path)
+            commonprefix = os.path.commonprefix([self.path, child_path])
+            return commonprefix.startswith(self.path)
 
     def _get_gpg_id(self, file_location):
         file_path = os.path.abspath(file_location)
