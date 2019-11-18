@@ -1,11 +1,11 @@
 python-pass
 ###########
 
-.. image:: https://travis-ci.org/ReAzem/python-pass.svg?branch=master
-    :target: https://travis-ci.org/ReAzem/python-pass
+.. image:: https://travis-ci.org/aviau/python-pass.svg?branch=master
+    :target: https://travis-ci.org/aviau/python-pass
 
-.. image:: https://img.shields.io/coveralls/ReAzem/python-pass.svg
-  :target: https://coveralls.io/r/ReAzem/python-pass?branch=master
+.. image:: https://img.shields.io/coveralls/aviau/python-pass.svg
+  :target: https://coveralls.io/r/aviau/python-pass?branch=master
 
 .. image:: https://readthedocs.org/projects/pypass/badge/?version=latest&style
     :target: https://readthedocs.org/projects/pypass/
