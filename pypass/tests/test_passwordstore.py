@@ -61,8 +61,6 @@ class TestPasswordStore(unittest.TestCase):
         # Construct on properly initialized directory
         store = PasswordStore(self.dir)
         self.assertEqual(store._get_gpg_id(self.dir), '5C5833E3')
-        email_path = os.path.join(self.dir, 'Email')
-        self.assertEqual(store._get_gpg_id(email_path), '86B4789B')
         self.assertFalse(store.uses_git)
         self.assertEqual(self.dir, store.path)
 
