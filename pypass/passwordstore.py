@@ -61,21 +61,43 @@ class PasswordStore(object):
             path=os.path.join(os.getenv("HOME"), ".password-store"),
             git_dir=None,
     ):
-        self.path = path
+        self.path = os.path.abspath(path)
 
-        # Read the .gpg-id
-        gpg_id_path = os.path.join(path, '.gpg-id')
-        if os.path.isfile(gpg_id_path):
-            with open(gpg_id_path, 'r') as gpg_id_file:
-                self.gpg_id = gpg_id_file.read().strip()
-        else:
-            raise Exception("could not find .gpg-id file")
+        # Check if a main .gpg-id exists
+        self._get_gpg_id(self.path)
 
         # Try to locate the git dir
         git_dir = git_dir or os.path.join(self.path, '.git')
         self.uses_git = os.path.isdir(git_dir)
         if self.uses_git:
             self.git_dir = git_dir
+
+    def _is_valid_store_subpath(self, file_location):
+        child_path = os.path.abspath(file_location)
+
+        try:
+            # Requires at least Python 3.5
+            store_commonpath = os.path.commonpath([self.path])
+            child_commonpath = os.path.commonpath([self.path, child_path])
+            return store_commonpath == child_commonpath
+        except AttributeError:
+            # Pre-3.5 fallback
+            commonprefix = os.path.commonprefix([self.path, child_path])
+            return commonprefix.startswith(self.path)
+
+    def _get_gpg_id(self, file_location):
+        file_path = os.path.abspath(file_location)
+
+        while self._is_valid_store_subpath(file_path):
+            # Read the .gpg-id
+            gpg_id_path = os.path.join(file_path, '.gpg-id')
+            if os.path.isfile(gpg_id_path):
+                with open(gpg_id_path, 'r') as gpg_id_file:
+                    return gpg_id_file.read().strip()
+
+            file_path = os.path.dirname(file_path)
+
+        raise Exception("could not find .gpg-id file")
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store
@@ -165,7 +187,7 @@ class PasswordStore(object):
             [
                 GPG_BIN,
                 '-e',
-                '-r', self.gpg_id,
+                '-r', self._get_gpg_id(passfile_path),
                 '--batch',
                 '--use-agent',
                 '--no-tty',
