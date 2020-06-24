@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+import time
 
 import click.testing
 
@@ -160,8 +161,6 @@ class TestCommand(unittest.TestCase):
         self.assertEqual(show_result.output,
                          'Error: test.com is not in the password store.\n')
 
-    # Can't get xclip to work in Travis.
-    @pypass.tests.skipIfTravis
     def test_show_clip(self):
         store = PasswordStore(self.dir)
         store.insert_password('clip_test', 'clipme999\nbutnotthisnewline\nfff')
@@ -509,12 +508,12 @@ class TestCommand(unittest.TestCase):
         self.assertEqual(len(new_password), 10)
         self.assertEqual(remainder, 'second')
 
-    @pypass.tests.skipIfTravis
     def test_generate_clip(self):
         generate = self.run_cli(['generate', '-c', 'clip.me'])
 
         self.assertEqual(generate.output, 'Copied clip.me to clipboard.\n')
 
+        time.sleep(0.1)
         xclip = subprocess.Popen(
             ['xclip', '-o', '-selection', 'clipboard'],
             stdout=subprocess.PIPE
