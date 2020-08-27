@@ -109,7 +109,7 @@ class TestCommand(unittest.TestCase):
         self.run_cli(['insert', '-m', 'test.com'], input='first\nsecond\n')
 
         store = PasswordStore(self.dir)
-        content = store.get_decrypted_password('test.com')
+        content = store.get_decrypted_password('test.com').content
         self.assertEqual(content, 'first\nsecond\n')
 
         # Echo the password and ask for it only once
@@ -120,7 +120,7 @@ class TestCommand(unittest.TestCase):
             'Enter password for test2.com: oneLine\n'
         )
 
-        content2 = store.get_decrypted_password('test2.com')
+        content2 = store.get_decrypted_password('test2.com').content
         self.assertEqual(content2, 'oneLine')
 
         # Mismatching inputs should cause abort
@@ -187,7 +187,7 @@ class TestCommand(unittest.TestCase):
         mock_editor = os.path.join(os.path.dirname(__file__), 'mock_editor.py')
         self.run_cli(['--EDITOR', mock_editor, 'edit', 'test.com'])
 
-        edited_content = store.get_decrypted_password('test.com')
+        edited_content = store.get_decrypted_password('test.com').content
         self.assertEqual(edited_content, 'edited')
 
     def test_edit_not_exist(self):
@@ -484,7 +484,7 @@ class TestCommand(unittest.TestCase):
         self.assertIsNotNone(re.match('[a-zA-Z0-9]{25}$', password))
 
         store = PasswordStore(self.dir)
-        decoded = store.get_decrypted_password('test.com')
+        decoded = store.get_decrypted_password('test.com').content
         self.assertEqual(decoded, password)
 
     def test_generate_in_place(self):
@@ -504,7 +504,7 @@ class TestCommand(unittest.TestCase):
             'Replace generated password for in-place.com.'
         )
 
-        new_content = store.get_decrypted_password('in-place.com')
+        new_content = store.get_decrypted_password('in-place.com').content
         new_password, _, remainder = new_content.partition('\n')
         self.assertEqual(len(new_password), 10)
         self.assertEqual(remainder, 'second')
