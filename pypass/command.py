@@ -175,7 +175,8 @@ def generate(config, pass_name, pass_length, no_symbols, clip, in_place):
 @click.argument('path', type=click.STRING)
 def edit(config, path):
     if path in config['password_store'].get_passwords_list():
-        old_password = config['password_store'].get_decrypted_password(path)
+        old_password = config['password_store']\
+            .get_decrypted_password(path).content
         with tempfile.NamedTemporaryFile() as temp_file:
             temp_file.write(old_password.encode())
             temp_file.flush()
@@ -207,8 +208,7 @@ def show(config, path, clip):
         click.echo('Error: %s is not in the password store.' % path)
         sys.exit(1)
 
-    decrypted_password = \
-        config['password_store'].get_decrypted_password(path).strip()
+    entry = config['password_store'].get_decrypted_password(path)
 
     if clip:
         xclip = subprocess.Popen(
@@ -218,21 +218,21 @@ def show(config, path, clip):
             ],
             stdin=subprocess.PIPE
         )
-        xclip.stdin.write(decrypted_password.split('\n')[0].encode('utf8'))
+        xclip.stdin.write(entry.password.encode('utf8'))
         xclip.stdin.close()
         click.echo('Copied %s to clipboard.' % path)
     else:
-        click.echo(decrypted_password)
+        click.echo(entry.content.rstrip())
 
 
 @main.command()
 @click.argument('path', type=click.STRING)
 @click.pass_obj
 def connect(config, path):
-    store = config['password_store']
-    hostname = store.get_decrypted_password(path, entry=EntryType.hostname)
-    username = store.get_decrypted_password(path, entry=EntryType.username)
-    password = store.get_decrypted_password(path, entry=EntryType.password)
+    entry = config['password_store'].get_decrypted_password(path)
+    hostname = entry[EntryType.hostname]
+    username = entry[EntryType.username]
+    password = entry[EntryType.password]
     s = pxssh.pxssh()
     click.echo("Connectig to %s" % hostname)
     s.login(hostname, username, password=password)
@@ -309,8 +309,8 @@ def find(config, search_terms):
 @click.pass_obj
 def grep(config, search_string):
     for password in config['password_store'].get_passwords_list():
-        decrypted_password = \
-            config['password_store'].get_decrypted_password(password)
+        decrypted_password = config['password_store']\
+            .get_decrypted_password(password).content
 
         grep = subprocess.Popen(
             ['grep', '-e', search_string],

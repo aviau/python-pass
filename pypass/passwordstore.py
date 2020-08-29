@@ -20,9 +20,8 @@
 import os
 import subprocess
 import string
-import re
 
-from .entry_type import EntryType
+from .password import Password
 
 # Secure source of randomness for password generation
 try:
@@ -115,12 +114,11 @@ class PasswordStore(object):
 
         return passwords
 
-    def get_decrypted_password(self, path, entry=None):
-        """Returns the content of the decrypted password file
+    def get_decrypted_password(self, path):
+        """Returns the decrypted password file as a `Password` object
 
         :param path: The path of the password to be decrypted. Example:
                      'email.com'
-        :param entry: The entry to retreive. (EntryType enum)
         """
         passfile_path = os.path.realpath(
             os.path.join(
@@ -144,28 +142,7 @@ class PasswordStore(object):
 
         if gpg.returncode == 0:
             decrypted_password = gpg.stdout.read().decode()
-
-            if entry == EntryType.username:
-                usr = re.search(
-                    '(?:username|user|login): (.+)',
-                    decrypted_password
-                )
-                if usr:
-                    return usr.groups()[0]
-            elif entry == EntryType.password:
-                pw = re.search('(?:password|pass): (.+)', decrypted_password)
-                if pw:
-                    return pw.groups()[0]
-                else:  # If there is no match, password is the first line
-                    return decrypted_password.split('\n')[0]
-            elif entry == EntryType.hostname:
-                hostname = re.search(
-                    '(?:host|hostname): (.+)', decrypted_password
-                )
-                if hostname:
-                    return hostname.groups()[0]
-            else:
-                return decrypted_password
+            return Password(decrypted_password)
         else:
             raise Exception('Couldn\'t decrypt %s' % path)
 
@@ -220,7 +197,7 @@ class PasswordStore(object):
         :returns: Generated password.
         """
         if first_line_only:
-            old_content = self.get_decrypted_password(path)
+            old_content = self.get_decrypted_password(path).content
             content_wo_pass = ''.join(old_content.partition('\n')[1:])
         else:
             content_wo_pass = ''

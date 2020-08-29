@@ -96,39 +96,35 @@ class TestPasswordStore(unittest.TestCase):
 
         self.assertEqual(
             password,
-            store.get_decrypted_password('hello.com')
+            store.get_decrypted_password('hello.com').content
         )
 
     def test_get_decrypted_password_specific_entry(self):
         store = PasswordStore(self.dir)
-        password = 'ELLO'
-        store.insert_password('hello.com', password)
+        store.insert_password('hello.com', 'ELLO')
+        password = store.get_decrypted_password('hello.com')
+
+        # Using an `str` key to get an entry should fail.
+        self.assertRaises(TypeError, password.__getitem__, 'password')
 
         # When there is no 'password:' mention, the password is assumed to be
         # the first line.
-        self.assertEqual(
-            'ELLO',
-            store.get_decrypted_password('hello.com', entry=EntryType.password)
-        )
+        self.assertEqual('ELLO', password[EntryType.password])
 
         store.insert_password('hello.com', 'sdfsdf\npassword: pwd')
-        self.assertEqual(
-            'pwd',
-            store.get_decrypted_password('hello.com', entry=EntryType.password)
-        )
+        password2 = store.get_decrypted_password('hello.com')
+        self.assertEqual('pwd', password2[EntryType.password])
+
+        # Getting a nonexistent entry should return `None`.
+        self.assertIsNone(password2[EntryType.username])
 
         store.insert_password(
             'hello',
             'sdf\npassword: pwd\nusername: bob\nhost: salut.fr'
         )
-        self.assertEqual(
-            'bob',
-            store.get_decrypted_password('hello', entry=EntryType.username)
-        )
-        self.assertEqual(
-            'salut.fr',
-            store.get_decrypted_password('hello', entry=EntryType.hostname)
-        )
+        password3 = store.get_decrypted_password('hello')
+        self.assertEqual('bob', password3[EntryType.username])
+        self.assertEqual('salut.fr', password3[EntryType.hostname])
 
     def test_get_decrypted_password_only_password(self):
         store = PasswordStore(self.dir)
@@ -136,7 +132,7 @@ class TestPasswordStore(unittest.TestCase):
         store.insert_password('hello.com', password)
         self.assertEqual(
             'ELLO',
-            store.get_decrypted_password('hello.com')
+            store.get_decrypted_password('hello.com').content
         )
 
     def test_get_decrypted_password_deeply_nested(self):
@@ -148,11 +144,11 @@ class TestPasswordStore(unittest.TestCase):
         store.insert_password('A/B/C/hello.com', 'Bob')
         self.assertEqual(
             'Alice',
-            store.get_decrypted_password('A/B/C/D/hello.com')
+            store.get_decrypted_password('A/B/C/D/hello.com').content
         )
         self.assertEqual(
             'Bob',
-            store.get_decrypted_password('A/B/C/hello.com')
+            store.get_decrypted_password('A/B/C/hello.com').content
         )
         self.assertTrue(
             os.path.isdir(os.path.join(self.dir, 'A', 'B', 'C', 'D'))
@@ -253,17 +249,17 @@ class TestPasswordStore(unittest.TestCase):
         store = PasswordStore(self.dir)
 
         store.generate_password('letters.net', digits=False, symbols=False)
-        only_letters = store.get_decrypted_password('letters.net')
+        only_letters = store.get_decrypted_password('letters.net').content
         self.assertTrue(only_letters.isalpha())
 
         store.generate_password('alphanum.co.uk', digits=True, symbols=False)
-        alphanum = store.get_decrypted_password('alphanum.co.uk')
+        alphanum = store.get_decrypted_password('alphanum.co.uk').content
         self.assertTrue(alphanum.isalnum())
         for char in alphanum:
             self.assertTrue(char not in string.punctuation)
 
         store.generate_password('hundred.org', length=100)
-        length_100 = store.get_decrypted_password('hundred.org')
+        length_100 = store.get_decrypted_password('hundred.org').content
         self.assertEqual(len(length_100), 100)
 
     def test_generate_password_uses_correct_gpg_id(self):
@@ -313,7 +309,7 @@ class TestPasswordStore(unittest.TestCase):
         store.insert_password('nope.org', 'pw\nremains intact')
         store.generate_password('nope.org', length=3, first_line_only=True)
 
-        new_content = store.get_decrypted_password('nope.org')
+        new_content = store.get_decrypted_password('nope.org').content
         new_password, _, remainder = new_content.partition('\n')
         self.assertNotEqual(new_password, 'pw')
         self.assertEqual(remainder, 'remains intact')
