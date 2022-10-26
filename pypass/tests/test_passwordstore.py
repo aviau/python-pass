@@ -60,7 +60,7 @@ class TestPasswordStore(unittest.TestCase):
     def test_constructor(self):
         # Construct on properly initialized directory
         store = PasswordStore(self.dir)
-        self.assertEqual(store._get_gpg_id(self.dir), '5C5833E3')
+        self.assertEqual(store._get_gpg_ids(self.dir), ['5C5833E3'])
         self.assertFalse(store.uses_git)
         self.assertEqual(self.dir, store.path)
 

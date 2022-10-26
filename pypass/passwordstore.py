@@ -64,7 +64,7 @@ class PasswordStore(object):
         self.path = os.path.abspath(path)
 
         # Check if a main .gpg-id exists
-        self._get_gpg_id(self.path)
+        self._get_gpg_ids(self.path)
 
         # Try to locate the git dir
         git_dir = git_dir or os.path.join(self.path, '.git')
@@ -85,7 +85,7 @@ class PasswordStore(object):
             commonprefix = os.path.commonprefix([self.path, child_path])
             return commonprefix.startswith(self.path)
 
-    def _get_gpg_id(self, file_location):
+    def _get_gpg_ids(self, file_location):
         file_path = os.path.abspath(file_location)
 
         while self._is_valid_store_subpath(file_path):
@@ -93,7 +93,7 @@ class PasswordStore(object):
             gpg_id_path = os.path.join(file_path, '.gpg-id')
             if os.path.isfile(gpg_id_path):
                 with open(gpg_id_path, 'r') as gpg_id_file:
-                    return gpg_id_file.read().strip()
+                    return [line.strip() for line in gpg_id_file if line.strip()]
 
             file_path = os.path.dirname(file_path)
 
@@ -182,12 +182,16 @@ class PasswordStore(object):
 
         if not os.path.isdir(os.path.dirname(passfile_path)):
             os.makedirs(os.path.dirname(passfile_path))
+            
+        recipient_args = []
+        for recipient in self._get_gpg_ids(passfile_path):
+            recipient_args.extend(['-r', recipient])
 
         gpg = subprocess.Popen(
             [
                 GPG_BIN,
                 '-e',
-                '-r', self._get_gpg_id(passfile_path),
+                *recipient_args,
                 '--batch',
                 '--use-agent',
                 '--no-tty',
