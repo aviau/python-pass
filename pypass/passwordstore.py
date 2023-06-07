@@ -87,17 +87,19 @@ class PasswordStore(object):
 
     def _get_gpg_ids(self, file_location):
         file_path = os.path.abspath(file_location)
+        tried = []
 
         while self._is_valid_store_subpath(file_path):
             # Read the .gpg-id
             gpg_id_path = os.path.join(file_path, '.gpg-id')
+            tried.append(gpg_id_path)
             if os.path.isfile(gpg_id_path):
                 with open(gpg_id_path, 'r') as gpg_id_file:
                     return [line.strip() for line in gpg_id_file if line.strip()]
 
             file_path = os.path.dirname(file_path)
 
-        raise Exception("could not find .gpg-id file")
+        raise Exception("could not find .gpg-id file for {}, tried: {}".format(file_location, " ; ".join(tried)))
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store
