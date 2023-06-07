@@ -61,10 +61,10 @@ class PasswordStore(object):
             path=os.path.join(os.getenv("HOME"), ".password-store"),
             git_dir=None,
     ):
-        self.path = os.path.abspath(path)
+        self.path = os.path.realpath(path)
 
         # Check if a main .gpg-id exists
-        self._get_gpg_id(self.path)
+        self._get_gpg_ids(self.path)
 
         # Try to locate the git dir
         git_dir = git_dir or os.path.join(self.path, '.git')
@@ -73,7 +73,7 @@ class PasswordStore(object):
             self.git_dir = git_dir
 
     def _is_valid_store_subpath(self, file_location):
-        child_path = os.path.abspath(file_location)
+        child_path = os.path.realpath(file_location)
 
         try:
             # Requires at least Python 3.5
@@ -85,19 +85,21 @@ class PasswordStore(object):
             commonprefix = os.path.commonprefix([self.path, child_path])
             return commonprefix.startswith(self.path)
 
-    def _get_gpg_id(self, file_location):
-        file_path = os.path.abspath(file_location)
+    def _get_gpg_ids(self, file_location):
+        file_path = os.path.realpath(file_location)
+        tried = []
 
         while self._is_valid_store_subpath(file_path):
             # Read the .gpg-id
             gpg_id_path = os.path.join(file_path, '.gpg-id')
+            tried.append(gpg_id_path)
             if os.path.isfile(gpg_id_path):
                 with open(gpg_id_path, 'r') as gpg_id_file:
-                    return gpg_id_file.read().strip()
+                    return [line.strip() for line in gpg_id_file if line.strip()]
 
             file_path = os.path.dirname(file_path)
 
-        raise Exception("could not find .gpg-id file")
+        raise Exception("could not find .gpg-id file for {}, tried: {}".format(file_location, " ; ".join(tried)))
 
     def get_passwords_list(self):
         """Returns a list of the passwords in the store
@@ -182,12 +184,16 @@ class PasswordStore(object):
 
         if not os.path.isdir(os.path.dirname(passfile_path)):
             os.makedirs(os.path.dirname(passfile_path))
+            
+        recipient_args = []
+        for recipient in self._get_gpg_ids(passfile_path):
+            recipient_args.extend(['-r', recipient])
 
         gpg = subprocess.Popen(
             [
                 GPG_BIN,
                 '-e',
-                '-r', self._get_gpg_id(passfile_path),
+                *recipient_args,
                 '--batch',
                 '--use-agent',
                 '--no-tty',
