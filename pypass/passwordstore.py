@@ -61,7 +61,7 @@ class PasswordStore(object):
             path=os.path.join(os.getenv("HOME"), ".password-store"),
             git_dir=None,
     ):
-        self.path = os.path.abspath(path)
+        self.path = os.path.realpath(path)
 
         # Check if a main .gpg-id exists
         self._get_gpg_ids(self.path)
@@ -73,7 +73,7 @@ class PasswordStore(object):
             self.git_dir = git_dir
 
     def _is_valid_store_subpath(self, file_location):
-        child_path = os.path.abspath(file_location)
+        child_path = os.path.realpath(file_location)
 
         try:
             # Requires at least Python 3.5
@@ -86,7 +86,7 @@ class PasswordStore(object):
             return commonprefix.startswith(self.path)
 
     def _get_gpg_ids(self, file_location):
-        file_path = os.path.abspath(file_location)
+        file_path = os.path.realpath(file_location)
         tried = []
 
         while self._is_valid_store_subpath(file_path):
